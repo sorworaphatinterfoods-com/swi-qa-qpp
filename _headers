@@ -1,0 +1,32 @@
+# Cloudflare Pages headers configuration
+# Apply security + caching headers for PWA assets
+
+/*
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(self), microphone=(), geolocation=(self)
+
+# Service Worker must not be cached aggressively - users need updates fast
+/sw.js
+  Cache-Control: public, max-age=0, must-revalidate
+  Service-Worker-Allowed: /
+
+# Manifest changes infrequently
+/manifest.webmanifest
+  Cache-Control: public, max-age=3600
+  Content-Type: application/manifest+json
+
+# Icons rarely change - cache long
+/icon-*.png
+  Cache-Control: public, max-age=2592000, immutable
+
+/favicon-*.png
+  Cache-Control: public, max-age=2592000, immutable
+
+# Main HTML revalidates each visit
+/operations.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+/
+  Cache-Control: public, max-age=0, must-revalidate

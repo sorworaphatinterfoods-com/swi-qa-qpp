@@ -1,0 +1,3 @@
+# Cloudflare Pages redirects
+# Make / serve the operations app directly
+/    /operations.html    200

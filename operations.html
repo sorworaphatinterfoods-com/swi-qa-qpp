@@ -1,0 +1,2718 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<title>Smart QA Department System — SWI Foods</title>
+
+<!-- PWA -->
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#0D6E64">
+<meta name="application-name" content="SWI QA">
+<meta name="description" content="ระบบบริหารคุณภาพ QA Department — สรวรพัฒน์อินเตอร์ฟู้ดส์">
+<meta name="format-detection" content="telephone=no">
+
+<!-- iOS / Safari -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SWI QA">
+<link rel="apple-touch-icon" href="./icon-180-apple.png">
+<link rel="apple-touch-icon" sizes="180x180" href="./icon-180-apple.png">
+
+<!-- Favicons -->
+<link rel="icon" type="image/png" sizes="32x32" href="./favicon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="./favicon-64.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['"IBM Plex Sans Thai"', 'system-ui', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'monospace']
+      },
+      colors: {
+        ink: { DEFAULT: '#0B1220', soft: '#1A2236', mute: '#5A6478' },
+        brand: { DEFAULT: '#0D6E64', dark: '#08544C', light: '#2F8F84', tint: '#E6F2F0' },
+        accent: { gold: '#C99A2E', amber: '#F59E0B', red: '#DC2626', blue: '#2563EB' },
+        paper: { DEFAULT: '#FAF8F4', warm: '#F4EFE6', cool: '#F0F4F8' }
+      }
+    }
+  }
+};
+</script>
+<style>
+  body { background: #FAF8F4; color: #0B1220; font-feature-settings: 'kern' 1, 'liga' 1; }
+  .card { background: #fff; border: 1px solid #E5E2DA; border-radius: 12px; }
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 8px; font-weight: 500; font-size: 14px; transition: all .15s; cursor: pointer; }
+  .btn-primary { background: #0D6E64; color: #fff; }
+  .btn-primary:hover { background: #08544C; }
+  .btn-ghost { background: transparent; color: #0B1220; border: 1px solid #E5E2DA; }
+  .btn-ghost:hover { background: #F4EFE6; }
+  .btn-danger { background: #DC2626; color: #fff; }
+  .btn-danger:hover { background: #B91C1C; }
+  .input, .select, .textarea { width: 100%; padding: 8px 12px; border: 1px solid #D6D0C2; border-radius: 8px; background: #fff; font-size: 14px; font-family: inherit; }
+  .input:focus, .select:focus, .textarea:focus { outline: none; border-color: #0D6E64; box-shadow: 0 0 0 3px rgba(13,110,100,.12); }
+  .label { font-size: 12px; font-weight: 600; color: #5A6478; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 4px; display: block; }
+  .badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+  .badge-green { background: #D1FAE5; color: #065F46; }
+  .badge-amber { background: #FEF3C7; color: #92400E; }
+  .badge-red { background: #FEE2E2; color: #991B1B; }
+  .badge-blue { background: #DBEAFE; color: #1E40AF; }
+  .badge-gray { background: #E5E7EB; color: #374151; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-radius: 8px; color: #cbd5e1; font-size: 14px; cursor: pointer; transition: all .12s; }
+  .nav-item:hover { background: rgba(255,255,255,.06); color: #fff; }
+  .nav-item.active { background: #0D6E64; color: #fff; font-weight: 600; }
+  .nav-section { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: #64748b; padding: 14px 14px 6px; font-weight: 600; }
+  .kpi { background: linear-gradient(135deg, #fff 0%, #FAF8F4 100%); border: 1px solid #E5E2DA; padding: 18px; border-radius: 12px; }
+  .kpi-value { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: #5A6478; padding: 10px 12px; border-bottom: 2px solid #E5E2DA; font-weight: 600; }
+  td { padding: 12px; border-bottom: 1px solid #F0EDE5; font-size: 14px; }
+  tr:hover td { background: #FAF8F4; }
+  .modal-backdrop { background: rgba(11, 18, 32, .55); backdrop-filter: blur(4px); }
+  .scroll-narrow::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scroll-narrow::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+  .skel { background: linear-gradient(90deg, #F0EDE5 0%, #F8F5ED 50%, #F0EDE5 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
+  @keyframes shimmer { 0%{ background-position: -200% 0;} 100%{ background-position: 200% 0;} }
+  .fade-in { animation: fadeIn .25s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  .stat-up { color: #059669; }
+  .stat-down { color: #DC2626; }
+  @media print {
+    .no-print { display: none !important; }
+    body { background: #fff; }
+  }
+
+  /* ========== MOBILE / PWA STYLES ========== */
+  /* Respect iOS safe area (notch) */
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
+  /* Standalone PWA mode = a bit more compact header */
+  @media (display-mode: standalone) {
+    body { background: #FAF8F4; }
+  }
+  /* Mobile drawer behavior */
+  .drawer-backdrop {
+    position: fixed; inset: 0; background: rgba(11,18,32,.55); z-index: 39;
+    opacity: 0; pointer-events: none; transition: opacity .2s ease;
+  }
+  .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+
+  @media (max-width: 900px) {
+    /* Hide sidebar by default on mobile */
+    #sidebar {
+      position: fixed; left: 0; top: 0; bottom: 0; z-index: 40;
+      transform: translateX(-100%);
+      transition: transform .25s cubic-bezier(.4,0,.2,1);
+      box-shadow: 4px 0 24px rgba(0,0,0,.25);
+      padding-top: env(safe-area-inset-top);
+    }
+    #sidebar.open { transform: translateX(0); }
+    #mobileMenuBtn { display: inline-flex !important; }
+    #pageHeader { padding-left: 12px; padding-right: 12px; }
+    #pageContent { padding: 12px !important; }
+    h1#pageTitle { font-size: 16px !important; }
+    p#pageSubtitle { display: none; }
+    /* Hide non-essential header buttons on mobile */
+    .header-btn-desktop { display: none !important; }
+    /* Touch-friendly buttons */
+    .btn { padding: 10px 14px; min-height: 40px; }
+    .btn-primary, .btn-ghost { min-height: 44px; }
+    /* Table cards layout for tiny screens */
+    table { font-size: 13px; }
+    td, th { padding: 8px 6px; }
+    .card { border-radius: 10px; }
+    /* KPI grid tighter on mobile */
+    .kpi { padding: 12px; }
+    .kpi .text-3xl { font-size: 22px !important; }
+    /* Modal full screen on mobile */
+    #modal > .card {
+      max-width: 100% !important;
+      max-height: 100vh !important;
+      height: 100vh;
+      border-radius: 0;
+      margin: 0;
+    }
+    /* Bigger tap targets in nav */
+    .nav-item { padding: 14px 16px; font-size: 15px; }
+  }
+  /* Install banner */
+  #installBanner {
+    position: fixed; bottom: 16px; left: 16px; right: 16px;
+    background: #0D6E64; color: #fff; border-radius: 12px;
+    padding: 14px; z-index: 30; box-shadow: 0 8px 24px rgba(0,0,0,.2);
+    display: none; align-items: center; gap: 12px;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+  }
+  #installBanner.show { display: flex; }
+  /* Update banner */
+  #updateBanner {
+    position: fixed; top: calc(16px + env(safe-area-inset-top)); left: 16px; right: 16px;
+    background: #F59E0B; color: #fff; border-radius: 12px;
+    padding: 10px 14px; z-index: 50; box-shadow: 0 8px 24px rgba(0,0,0,.2);
+    display: none; align-items: center; gap: 12px;
+  }
+  #updateBanner.show { display: flex; }
+  /* Hamburger button */
+  #mobileMenuBtn { display: none; }
+  #mobileMenuBtn:hover { background: #F4EFE6; }
+  /* Fix iOS form zoom: inputs must be 16px+ */
+  @supports (-webkit-touch-callout: none) {
+    .input, .select, .textarea { font-size: 16px; }
+  }
+
+  /* ========== A4 PRINT REPORT ========== */
+  #printRoot { display: none; }
+  @media print {
+    body.print-report-mode { background: #fff !important; padding: 0 !important; }
+    body.print-report-mode > *:not(#printRoot) { display: none !important; }
+    body.print-report-mode #printRoot {
+      display: block !important;
+      position: static;
+      font-family: 'IBM Plex Sans Thai', sans-serif;
+      color: #000;
+    }
+    @page { size: A4 portrait; margin: 10mm 12mm; }
+    .pr-page { page-break-after: always; }
+    .pr-page:last-child { page-break-after: auto; }
+    .pr-no-break { page-break-inside: avoid; }
+  }
+  /* On-screen preview of the A4 report (when previewing before print) */
+  #printRoot.preview {
+    display: block;
+    max-width: 210mm; margin: 20px auto; background: #fff;
+    padding: 14mm 12mm; box-shadow: 0 4px 24px rgba(0,0,0,.15);
+    color: #000; font-family: 'IBM Plex Sans Thai', sans-serif;
+  }
+  .pr-doc { font-size: 12px; line-height: 1.5; }
+  .pr-doc h2 { font-size: 17px; font-weight: 700; margin: 0; }
+  .pr-doc table { width: 100%; border-collapse: collapse; margin: 6px 0; }
+  .pr-doc th, .pr-doc td { border: 1px solid #333; padding: 4px 6px; font-size: 11px; text-align: left; vertical-align: top; }
+  .pr-doc th { background: #EDEDED; font-weight: 600; }
+  .pr-doc .pr-head-tbl td { border: 1px solid #999; }
+  .pr-pass { color: #047857; font-weight: 700; }
+  .pr-fail { color: #B91C1C; font-weight: 700; }
+  .pr-na   { color: #6B7280; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN OVERLAY -->
+<div id="loginScreen" class="fixed inset-0 z-50 flex items-center justify-center" style="background: linear-gradient(135deg, #08544C 0%, #0D6E64 50%, #0B1220 100%);">
+  <div class="card p-8 max-w-md w-full mx-4 fade-in">
+    <div class="text-center mb-6">
+      <div class="w-14 h-14 mx-auto rounded-xl bg-brand text-white flex items-center justify-center text-2xl font-bold mb-3">QA</div>
+      <h1 class="text-xl font-bold text-ink">Smart QA Department System</h1>
+      <p class="text-sm text-ink-mute mt-1">Sorworaphat InterFoods Co., Ltd.</p>
+    </div>
+    <div class="space-y-3">
+      <div>
+        <label class="label">ชื่อผู้ใช้</label>
+        <input id="loginUser" class="input" placeholder="admin / qa / inspector" value="admin">
+      </div>
+      <div>
+        <label class="label">รหัสผ่าน</label>
+        <input id="loginPass" type="password" class="input" placeholder="••••••" value="1234">
+      </div>
+      <button onclick="doLogin()" class="btn btn-primary w-full justify-center" style="padding: 12px;">เข้าสู่ระบบ</button>
+      <div class="text-xs text-ink-mute text-center mt-4 leading-relaxed">
+        บัญชีทดสอบ:<br>
+        <span class="font-mono">admin / 1234</span> (ผู้ดูแลระบบ) ·
+        <span class="font-mono">qa / 1234</span> (หัวหน้า QA) ·
+        <span class="font-mono">inspector / 1234</span> (เจ้าหน้าที่)
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="app" class="hidden flex h-screen">
+  <!-- Mobile drawer backdrop -->
+  <div id="drawerBackdrop" class="drawer-backdrop no-print" onclick="closeMobileNav()"></div>
+  <!-- Sidebar -->
+  <aside id="sidebar" class="no-print w-64 bg-ink text-white flex-shrink-0 flex flex-col">
+    <div class="p-4 border-b border-white/10 flex items-center gap-3">
+      <div class="w-9 h-9 rounded-lg bg-brand flex items-center justify-center font-bold">QA</div>
+      <div>
+        <div class="font-bold text-sm">Smart QA System</div>
+        <div class="text-xs text-slate-400">SWI Foods</div>
+      </div>
+    </div>
+    <nav class="flex-1 overflow-y-auto scroll-narrow p-2">
+      <div class="nav-section">ภาพรวม</div>
+      <div class="nav-item active" data-page="dashboard"><span>📊</span><span>Dashboard</span></div>
+
+      <div class="nav-section">Master Data</div>
+      <div class="nav-item" data-page="suppliers"><span>🏢</span><span>ซัพพลายเออร์</span></div>
+      <div class="nav-item" data-page="materials"><span>📦</span><span>วัตถุดิบ</span></div>
+      <div class="nav-item" data-page="finishedGoods"><span>🍗</span><span>สินค้าสำเร็จรูป</span></div>
+      <div class="nav-item" data-page="processes"><span>⚙️</span><span>กระบวนการ</span></div>
+      <div class="nav-item" data-page="ingredients"><span>🌶️</span><span>เครื่องปรุง</span></div>
+      <div class="nav-item" data-page="packaging"><span>📦</span><span>บรรจุภัณฑ์</span></div>
+      <div class="nav-item" data-page="chemicals"><span>🧪</span><span>สารเคมี</span></div>
+      <div class="nav-item" data-page="parameters"><span>📏</span><span>พารามิเตอร์</span></div>
+      <div class="nav-item" data-page="equipment"><span>🔧</span><span>เครื่องมือวัด</span></div>
+      <div class="nav-item" data-page="machines"><span>🏭</span><span>เครื่องจักร</span></div>
+      <div class="nav-item" data-page="ccps"><span>🎯</span><span>CCP Master</span></div>
+      <div class="nav-item" data-page="processParamMap"><span>🔗</span><span>Process ↔ Param</span></div>
+
+      <div class="nav-section">Operations & QA</div>
+      <div class="nav-item" data-page="rmInspection"><span>✓</span><span>ตรวจรับวัตถุดิบ</span></div>
+      <div class="nav-item" data-page="inprocess"><span>🔬</span><span>ตรวจระหว่างผลิต</span></div>
+      <div class="nav-item" data-page="fgInspection"><span>🍗</span><span>ตรวจ FG</span></div>
+      <div class="nav-item" data-page="pkgInspection"><span>📦</span><span>ตรวจบรรจุภัณฑ์</span></div>
+      <div class="nav-item" data-page="haccp"><span>🌡️</span><span>HACCP / CCP</span></div>
+      <div class="nav-item" data-page="ncCapa"><span>⚠️</span><span>NC / CAPA</span></div>
+      <div class="nav-item" data-page="environment"><span>🌡️</span><span>สิ่งแวดล้อม</span></div>
+      <div class="nav-item" data-page="training"><span>👥</span><span>ฝึกอบรม</span></div>
+      <div class="nav-item" data-page="traceability"><span>🔍</span><span>Traceability</span></div>
+      <div class="nav-item" data-page="complaints"><span>📋</span><span>ร้องเรียนลูกค้า</span></div>
+
+      <div class="nav-section">Reports</div>
+      <div class="nav-item" data-page="reports"><span>📈</span><span>รายงาน & KPI</span></div>
+      <div class="nav-item" data-page="settings"><span>⚙️</span><span>ตั้งค่าระบบ</span></div>
+    </nav>
+    <div class="p-3 border-t border-white/10">
+      <div class="flex items-center gap-3 px-2 py-2 rounded-lg bg-white/5">
+        <div id="userAvatar" class="w-8 h-8 rounded-full bg-brand flex items-center justify-center text-sm font-bold">A</div>
+        <div class="flex-1 min-w-0">
+          <div id="userName" class="text-sm font-semibold truncate">Administrator</div>
+          <div id="userRole" class="text-xs text-slate-400 truncate">ผู้ดูแลระบบ</div>
+        </div>
+        <button onclick="doLogout()" title="ออกจากระบบ" class="text-slate-400 hover:text-white p-1">⎋</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="flex-1 overflow-y-auto bg-paper">
+    <header id="pageHeader" class="no-print bg-white border-b border-stone-200 px-6 py-3 flex items-center justify-between sticky top-0 z-10" style="padding-top: calc(12px + env(safe-area-inset-top));">
+      <div class="flex items-center gap-2">
+        <button id="mobileMenuBtn" onclick="openMobileNav()" class="btn btn-ghost" style="padding:8px 10px;" aria-label="Open menu">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div>
+          <h1 id="pageTitle" class="text-lg font-bold">Dashboard</h1>
+          <p id="pageSubtitle" class="text-xs text-ink-mute">ภาพรวมสถานะคุณภาพและ KPI หลัก</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <div id="syncStatus" class="text-xs text-ink-mute flex items-center gap-1.5">
+          <span id="syncDot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span id="syncLabel" class="header-btn-desktop">Cloudflare D1</span>
+        </div>
+        <button id="installBtn" onclick="installPWA()" class="btn btn-primary header-btn-desktop" style="display:none;" title="ติดตั้งเป็นแอป">📱 ติดตั้ง</button>
+        <button onclick="exportAllData()" class="btn btn-ghost header-btn-desktop" title="Export ข้อมูลทั้งหมด">⬇ Export</button>
+        <button onclick="document.getElementById('importFile').click()" class="btn btn-ghost header-btn-desktop" title="Import ข้อมูล">⬆ Import</button>
+        <input type="file" id="importFile" class="hidden" accept=".json" onchange="importAllData(event)">
+      </div>
+    </header>
+    <div id="pageContent" class="p-6"></div>
+  </main>
+</div>
+
+<!-- MODAL CONTAINER -->
+<div id="modal" class="hidden fixed inset-0 z-40 modal-backdrop flex items-center justify-center p-4">
+  <div class="card max-w-2xl w-full max-h-[90vh] overflow-y-auto scroll-narrow">
+    <div class="px-5 py-4 border-b border-stone-200 flex justify-between items-center sticky top-0 bg-white z-10">
+      <h3 id="modalTitle" class="text-lg font-bold"></h3>
+      <button onclick="closeModal()" class="text-2xl text-ink-mute hover:text-ink leading-none">×</button>
+    </div>
+    <div id="modalBody" class="p-5"></div>
+  </div>
+</div>
+
+<!-- BARCODE / QR SCANNER OVERLAY -->
+<div id="scannerOverlay" class="hidden fixed inset-0 z-[60] bg-black/90 flex flex-col" style="padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)">
+  <div class="flex items-center justify-between px-4 py-3 text-white">
+    <div class="font-semibold">สแกนบาร์โค้ด / QR</div>
+    <button onclick="closeScanner()" class="text-3xl leading-none px-2">×</button>
+  </div>
+  <div class="flex-1 flex flex-col items-center justify-center px-4">
+    <div id="scannerView" class="w-full max-w-sm rounded-xl overflow-hidden bg-black" style="aspect-ratio:1"></div>
+    <div id="scannerHint" class="text-white/80 text-sm mt-4 text-center">วางบาร์โค้ดหรือ QR ให้อยู่ในกรอบ</div>
+    <div id="scannerManual" class="hidden w-full max-w-sm mt-4">
+      <div class="text-white/80 text-sm mb-2 text-center">หรือพิมพ์รหัสด้วยตนเอง</div>
+      <div class="flex gap-2">
+        <input id="scannerManualInput" class="input flex-1" placeholder="กรอกรหัส / lot / batch">
+        <button onclick="submitManualScan()" class="btn btn-primary">ตกลง</button>
+      </div>
+    </div>
+  </div>
+  <div class="px-4 py-3 flex gap-2 justify-center">
+    <button onclick="toggleScannerManual()" class="btn btn-ghost text-white border-white/30">⌨ พิมพ์เอง</button>
+    <button onclick="closeScanner()" class="btn btn-ghost text-white border-white/30">ยกเลิก</button>
+  </div>
+</div>
+
+<!-- A4 PRINT REPORT ROOT (hidden on screen, shown on print) -->
+<div id="printRoot"></div>
+
+<!-- TOAST -->
+<div id="toast" class="hidden fixed bottom-6 right-6 z-50 px-4 py-3 rounded-lg shadow-lg text-white font-medium fade-in"></div>
+
+<!-- PWA INSTALL BANNER (mobile-only, appears once dismiss-able) -->
+<div id="installBanner">
+  <div class="flex-1">
+    <div class="font-semibold">ติดตั้งแอปลงเครื่อง</div>
+    <div class="text-xs opacity-90 mt-0.5">ใช้งานเหมือนแอปจริง · ออฟไลน์ได้</div>
+  </div>
+  <button onclick="installPWA()" class="px-3 py-2 bg-white text-brand rounded-lg font-semibold text-sm">ติดตั้ง</button>
+  <button onclick="dismissInstall()" class="px-2 text-white/80 text-xl leading-none" aria-label="ปิด">×</button>
+</div>
+
+<!-- PWA UPDATE BANNER (when SW finds new version) -->
+<div id="updateBanner">
+  <span class="text-sm flex-1">มีเวอร์ชันใหม่พร้อมใช้งาน</span>
+  <button onclick="applyUpdate()" class="px-3 py-1.5 bg-white text-amber-600 rounded font-semibold text-sm">อัปเดต</button>
+</div>
+
+<script>
+/* ============================================================
+   SWI FOODS — Smart QA Department System
+   Single-file production SPA with full CRUD across 13 modules.
+   Storage: localStorage (primary) + optional Cloudflare Worker
+   sync via API_BASE_URL.
+   ============================================================ */
+
+const API_BASE_URL = 'https://swi-qa-api.swifoods.workers.dev'; // Cloudflare Worker — sync ขึ้น D1 อัตโนมัติทุกครั้งที่บันทึก
+const STORAGE_KEY = 'swi_qa_system_v1';
+
+/* ---------------- DEFAULT MASTER DATA ---------------- */
+const SEED = {
+  meta: { lastSync: null, version: '2.0.0', source: 'QA_Master_DATA.xlsx' },
+  users: [
+    { username: 'admin',     password: '1234', name: 'Administrator', role: 'ผู้ดูแลระบบ', dept: 'IT' },
+    { username: 'qa',        password: '1234', name: 'หัวหน้า QA',    role: 'QA Manager',   dept: 'QA' },
+    { username: 'inspector', password: '1234', name: 'เจ้าหน้าที่ QA', role: 'QA Inspector', dept: 'QA' }
+  ],
+  /* === SUPPLIERS === 33 records from supplier_master */
+  suppliers: [
+    { id: 'SP0001', name: 'บริษัท เบทาโกรเกษตรอุตสาหกรรม จำกัด (หมู)', type: 'RM', risk: 'HIGH', coa: 'Yes', halal: 'Yes', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-11-15', materialCode: 'RM0001, RM0002' },
+    { id: 'SP0002', name: 'บริษัท เบทาโกรเกษตรอุตสาหกรรม จำกัด (ไก่)', type: 'RM', risk: 'HIGH', coa: 'Yes', halal: 'Yes', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-11-15', materialCode: 'RM0004' },
+    { id: 'SP0003', name: 'บริษัท เอส แอล พิทักษ์ จำกัด', type: 'RM', risk: 'HIGH', coa: 'Yes', halal: 'Yes', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-10-10', materialCode: 'RM0001' },
+    { id: 'SP0004', name: 'บริษัท ฟู้ด จ๊อบ จำกัด', type: 'RM', risk: 'HIGH', coa: 'Yes', halal: 'Yes', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-10-05', materialCode: 'RM0004' },
+    { id: 'SP0005', name: 'ห้างหุ้นส่วนจำกัด หมูสามตัว', type: 'DM', risk: 'HIGH', coa: 'Yes', halal: 'Yes', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-07-12', materialCode: 'RM0006' },
+    { id: 'SP0006', name: 'ร้าน ปายปายค้าข้าว', type: 'DM', risk: 'LOW', coa: 'No', halal: 'No', gmp: '-', status: 'Conditional' },
+    { id: 'SP0007', name: 'บริษัท ซีพีแอ็กซ์ตร้า จำกัด (มหาชน)', type: 'DM', risk: 'LOW', coa: 'Yes', halal: 'No', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-09-20', materialCode: 'PD0006' },
+    { id: 'SP0008', name: 'บริษัท หยั่นหว่อ หยุ่น คอร์ปอเรชั่น จำกัด', type: 'DM', risk: 'LOW', coa: 'Yes', halal: 'Yes', gmp: 'Pending', status: 'Approved', lastAuditDate: '2025-08-15', materialCode: 'PD0001' },
+    { id: 'SP0009', name: 'บริษัท ยิ่งเจริญ มงคลฟู้ดส์ จำกัด', type: 'DM', risk: 'LOW', coa: 'Yes', halal: 'Yes', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-09-01', materialCode: 'PD0002' },
+    { id: 'SP0010', name: 'บริษัท เดลี่ ฟู้ดส์ จำกัด', type: 'DM', risk: 'LOW', coa: 'Yes', halal: 'Yes', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-10-01', materialCode: 'PD0019' },
+    { id: 'SP0011', name: 'บริษัท เอ็น.อาร์.น้ำตาลมะพร้าว จำกัด', type: 'DM', risk: 'LOW', coa: 'Yes', halal: 'Yes', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-11-02', materialCode: 'PD0018' },
+    { id: 'SP0012', name: 'โรงงานน้ำตาลโชควาสนา', type: 'DM', risk: 'LOW', coa: 'Yes', halal: 'Yes', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-06-20', materialCode: 'PD0017' },
+    { id: 'SP0013', name: 'บริษัท จิมสกรุ๊ป จำกัด', type: 'DM', risk: 'LOW', coa: 'Yes', halal: 'Yes', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-06-18', materialCode: 'PD0007' },
+    { id: 'SP0014', name: 'บริษัท ไอ พลัส ซัพพลายส์ จำกัด', type: 'DM', risk: 'LOW', coa: 'Yes', halal: 'No', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-08-01', materialCode: 'PD0008' },
+    { id: 'SP0015', name: 'หจก.สหบุญญชาติ ฟลาวเซ็นเตอร์', type: 'DM', risk: 'LOW', coa: 'Yes', halal: 'No', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-07-25', materialCode: 'PD0009' },
+    { id: 'SP0016', name: 'ร้าน จูนีย์ (หอม-กระเทียม)', type: 'DM', risk: 'LOW', coa: 'Yes', halal: 'No', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-07-26', materialCode: 'PD0011' },
+    { id: 'SP0017', name: 'บริษัท เอส เอ โอ การเกษตร จำกัด', type: 'DM', risk: 'LOW', coa: 'No', halal: 'No', gmp: '-', status: 'Approved', lastAuditDate: '2025-05-10', materialCode: 'PD0012' },
+    { id: 'SP0018', name: 'บริษัท กุยลิ้มซึ้ง จำกัด', type: 'DM', risk: 'LOW', coa: 'Yes', halal: 'Yes', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-09-12', materialCode: 'PD0030' },
+    { id: 'SP0019', name: 'บริษัท ตะวันพืชผล จำกัด', type: 'DM', risk: 'LOW', coa: 'Yes', halal: 'No', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-07-01', materialCode: 'PD0032' },
+    { id: 'SP0020', name: 'บริษัท อาหารเบทเทอร์ จำกัด', type: 'DM', risk: 'LOW', coa: 'Yes', halal: 'Yes', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-06-05', materialCode: 'PD0008' },
+    { id: 'SP0021', name: 'หจก.เชียงใหม่เบเกอร์มาร์ท', type: 'DM', risk: 'LOW', coa: 'Yes', halal: 'Yes', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-08-10', materialCode: 'PD0020' },
+    { id: 'SP0022', name: 'บริษัท อุทัยพลาสติก อุตสาหกรรม จำกัด', type: 'PM', risk: 'LOW', coa: 'Yes', halal: 'Yes', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-06-15', materialCode: 'PG0001' },
+    { id: 'SP0023', name: 'บริษัท เจเนอรัล เรคคอร์ด อินเตอร์ จำกัด', type: 'PM', risk: 'LOW', coa: 'Yes', halal: 'No', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-08-22', materialCode: 'PK0001' },
+    { id: 'SP0024', name: 'บริษัท บางกอก อินสทรูเมนท์ แอนด์เซอร์วิส จำกัด', type: 'PM', risk: 'LOW', coa: 'Yes', halal: 'No', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-07-30', materialCode: 'PK0010' },
+    { id: 'SP0025', name: 'บริษัท ศรีไม้ไผ่ทอง(2019) อุตสาหกรรม จำกัด', type: 'PM', risk: 'LOW', coa: 'No', halal: 'No', gmp: '-', status: 'Approved', lastAuditDate: '2025-05-20', materialCode: 'PK0019' },
+    { id: 'SP0026', name: 'บริษัท ฟิวเจอร์ บิสซิเนส โซลูชั่น จำกัด', type: 'PM', risk: 'LOW', coa: 'Yes', halal: 'No', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-08-05', materialCode: 'PK0040' },
+    { id: 'SP0027', name: 'ห้างหุ้นส่วนจำกัด วี-ริน เคมีคอล', type: 'CM', risk: 'MEDIUM', coa: 'Yes', halal: 'No', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-07-15', materialCode: 'CM0002' },
+    { id: 'SP0028', name: 'บริษัท เอ็นริช อินเตอร์เคมิคัล จำกัด', type: 'CM', risk: 'MEDIUM', coa: 'Yes', halal: 'No', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-07-18', materialCode: 'CM0003' },
+    { id: 'SP0029', name: 'บริษัท ฟลุสสิค เคม จำกัด', type: 'CM', risk: 'MEDIUM', coa: 'Yes', halal: 'No', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-07-22', materialCode: 'CM0006' },
+    { id: 'SP0030', name: 'บริษัท เบทเทอร์ ฟาร์มา จำกัด', type: 'CM', risk: 'MEDIUM', coa: 'Yes', halal: 'No', gmp: 'Certified', status: 'Approved', lastAuditDate: '2025-07-28', materialCode: 'CM0007' },
+    { id: 'SP0031', name: 'บริษัท ออฟฟิศเมท (ไทย) จำกัด', type: 'CM', risk: 'MEDIUM', coa: 'Yes', halal: 'No', gmp: 'Certified', status: 'Approved', materialCode: 'CM0001' },
+    { id: 'SP0032', name: 'บริษัท ท้อป เมาท์เทน จำกัด', type: 'PM', risk: 'LOW', coa: 'No', halal: 'No', gmp: '-', status: 'Approved', materialCode: 'PG0012' },
+    { id: 'SP0033', name: 'บริษัท ดวงเจริญ อินเตอร์เทรด จำกัด', type: 'RM', risk: 'HIGH', coa: 'No', halal: 'No', gmp: '-', status: 'Conditional', materialCode: 'RM0001' }
+  ],
+  /* === MATERIALS === 109 records from material_master (RM/DM/PM/CM combined) */
+  materials: [
+    { id: 'RM0001', name: 'สะโพกหมู', category: 'RM', subCategory: 'Pork', unit: 'กิโลกรัม', minTemp: 0, maxTemp: 7, shelfLife: 6, risk: 'High', supplier: 'SP0001', status: 'Active' },
+    { id: 'RM0002', name: 'มันสันแข็ง', category: 'RM', subCategory: 'Pork', unit: 'กิโลกรัม', minTemp: 0, maxTemp: 7, shelfLife: 6, risk: 'High', supplier: 'SP001', status: 'Active' },
+    { id: 'RM0004', name: 'เศษบีบีติดหนัง', category: 'RM', subCategory: 'Chicken', unit: 'กิโลกรัม', minTemp: 0, maxTemp: 7, shelfLife: 5, risk: 'High', supplier: 'SP005', status: 'Active' },
+    { id: 'RM0005', name: 'อกไก่', category: 'RM', subCategory: 'Chicken', unit: 'กิโลกรัม', minTemp: 0, maxTemp: 7, shelfLife: 5, risk: 'High', supplier: 'SP005', status: 'Active' },
+    { id: 'RM0006', name: 'ข้าวสารเหนียว', category: 'DM', subCategory: 'Rice', unit: 'กิโลกรัม', risk: 'Medium', supplier: 'SP005', status: 'Active' },
+    { id: 'PD0001', name: 'ซอสหอยนางรมหมู', category: 'DM', subCategory: 'Seasoning', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0002', name: 'ซอสหอยนางรมไก่', category: 'DM', subCategory: 'Seasoning', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0003', name: 'ซอสปรุงรสฝาเขียว', category: 'DM', subCategory: 'Seasoning', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0004', name: 'ซีอิ้วขาว  สูตร 1', category: 'DM', subCategory: 'Seasoning', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0005', name: 'ซีอิ้วดำฉลากส้ม', category: 'DM', subCategory: 'Ingredient', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0006', name: 'ซีอิ้วขาวเห็ดหอม', category: 'DM', subCategory: 'Seasoning', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0007', name: 'ผงปรุงรส', category: 'DM', subCategory: 'Seasoning', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0008', name: 'ผงชูรส', category: 'DM', subCategory: 'Seasoning', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0009', name: 'แป้งท้าว', category: 'DM', subCategory: 'Seasoning', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0010', name: 'เกลือ', category: 'DM', subCategory: 'Ingredient', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0011', name: 'กระเทียม', category: 'DM', subCategory: 'Seasoning', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0012', name: 'พริกไทยดำ', category: 'DM', subCategory: 'Seasoning', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0013', name: 'พริกไทยขาว', category: 'DM', subCategory: 'Seasoning', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0014', name: 'เมล็ดผักชี', category: 'DM', subCategory: 'Seasoning', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0015', name: 'ผงขมิ้น', category: 'DM', subCategory: 'Seasoning', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0016', name: 'ผงกระเทียม', category: 'DM', subCategory: 'Seasoning', unit: 'กรัม', status: 'Active' },
+    { id: 'PD0017', name: 'น้ำตาลมะพร้าวหมู', category: 'DM', subCategory: 'Ingredient', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0018', name: 'น้ำตาลมะพร้าวไก่', category: 'DM', subCategory: 'Ingredient', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0019', name: 'นมจืด', category: 'DM', subCategory: 'Ingredient', unit: 'กระป๋อง', status: 'Active' },
+    { id: 'PD0020', name: 'สีส้มแดง', category: 'DM', subCategory: 'Additive', unit: 'กรัม', status: 'Active' },
+    { id: 'PD0021', name: 'สีเหลืองไข่', category: 'DM', subCategory: 'Additive', unit: 'กรัม', status: 'Active' },
+    { id: 'PD0022', name: 'โซดา', category: 'DM', subCategory: 'Additive', unit: 'ขวด', status: 'Active' },
+    { id: 'PD0023', name: 'ฟอสเฟต', category: 'DM', subCategory: 'Additive', unit: 'กรัม', status: 'Active' },
+    { id: 'PD0024', name: 'แป้งมัน', category: 'DM', subCategory: 'Ingredient', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0025', name: 'วุ้นเส้น', category: 'DM', subCategory: 'Ingredient', unit: 'กรัม', status: 'Active' },
+    { id: 'PD0026', name: 'ข้าวเจ้า', category: 'DM', subCategory: 'Ingredient', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0027', name: 'ซอสบาร์บีคิว', category: 'DM', subCategory: 'Seasoning', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0028', name: 'ซอสพริก', category: 'DM', subCategory: 'Seasoning', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0029', name: 'เบคกิ้งโซดา', category: 'DM', subCategory: 'Additive', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0030', name: 'ผงสามเกลอ', category: 'DM', subCategory: 'Seasoning', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0031', name: 'พริกขี้หนูป่น', category: 'DM', subCategory: 'Seasoning', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0032', name: 'ผงพริกหม่าล่า', category: 'DM', subCategory: 'Seasoning', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0033', name: 'ผงกะหรี่', category: 'DM', subCategory: 'Seasoning', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PD0034', name: 'น้ำมันงา', category: 'DM', subCategory: 'Seasoning', unit: 'ลิตร', status: 'Active' },
+    { id: 'PD0035', name: 'น้ำปลา', category: 'DM', subCategory: 'Seasoning', unit: 'ลิตร', status: 'Active' },
+    { id: 'PD0036', name: 'ซอสโชยุ', category: 'DM', subCategory: 'Seasoning', unit: 'กรัม', status: 'Active' },
+    { id: 'PD0037', name: 'ซอสเทอริยากิ', category: 'DM', subCategory: 'Seasoning', unit: 'กรัม', status: 'Active' },
+    { id: 'PD0038', name: 'งาขาว', category: 'DM', subCategory: 'Seasoning', unit: 'กรัม', status: 'Active' },
+    { id: 'PG0001', name: 'ถุงหูหิ้ว9*18', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PG0002', name: 'ถุงหูหิ้ว12*20', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PG0003', name: 'ถุงหูหิ้ว12*18', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PG0004', name: 'ถุงใส6*9', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PG0005', name: 'ถุงขยะดำ 24*28*20mm', category: 'PM', subCategory: 'Plastic Bag', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PG0006', name: 'ถุงขยะสีชา', category: 'PM', subCategory: 'Plastic Bag', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PG0009', name: 'รองเท้าบูทยางสีขาว เบอร์ 11', category: 'PM', subCategory: 'Boots', unit: 'คู่', status: 'Active' },
+    { id: 'PG0010', name: 'รองเท้าบูทสีขาว เบอร์12', category: 'PM', subCategory: 'Boots', unit: 'คู่', status: 'Active' },
+    { id: 'PG0011', name: 'เอี๋ยมน้ำเงิน', category: 'PM', subCategory: 'Aprons', unit: 'ผืน', status: 'Active' },
+    { id: 'PG0012', name: 'ถุงมือยางสีน้ำเงิน/S', category: 'PM', subCategory: 'Gloves', unit: 'กล่อง', status: 'Active' },
+    { id: 'PG0013', name: 'ถุงมือยางสีน้ำเงิน/M', category: 'PM', subCategory: 'Gloves', unit: 'กล่อง', status: 'Active' },
+    { id: 'PG0014', name: 'ถุงมือยางสีน้ำเงิน/L', category: 'PM', subCategory: 'Gloves', unit: 'กล่อง', status: 'Active' },
+    { id: 'PG0015', name: 'ถุงHD A11"x17" หนา 0.12 มม./คู่', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PG0016', name: 'ถุง HD  A14"x25" หนา 0.12 มม./คู่ (สีขาว)', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PG0018', name: 'ถุง HD  A14"x25" หนา 0.12 มม./คู่ (สีฟ้า)', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PK0001', name: 'กล่องลูกฟูก5ชั้น ขนาด287*385*305', category: 'PM', subCategory: 'Packaging', unit: 'ใบ', status: 'Active' },
+    { id: 'PK0002', name: 'กล่องลูกฟูก5ชั้น ขนาด23*40*21.2', category: 'PM', subCategory: 'Packaging', unit: 'ใบ', status: 'Active' },
+    { id: 'PK0003', name: 'กล่องโฟม 25', category: 'PM', subCategory: 'Packaging', unit: 'ใบ', status: 'Active' },
+    { id: 'PK0004', name: 'กล่องโฟม 3 กก', category: 'PM', subCategory: 'Packaging', unit: 'ใบ', status: 'Active' },
+    { id: 'PK0005', name: 'ถุงHD A19*12(แผ่นแพ็ค)', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PK0006', name: 'ถุงHD/A10*16หนา0.08มม.คู่ไม่พิมพ์โลโก้', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PK0007', name: 'ถุงHD A10*16หนา พิมพ์โลโก้', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PK0008', name: 'ถุงNYLON+LL 220mm*300mm ซีล 3ด้าน', category: 'PM', subCategory: 'Packaging', unit: 'ใบ', status: 'Active' },
+    { id: 'PK0009', name: 'ถุงHD 11*17 พิมพ์โลโก้หมูนมสด size s', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PK0010', name: 'เทปใส', category: 'PM', subCategory: 'Tape', unit: 'ม้วน', status: 'Active' },
+    { id: 'PK0011', name: 'แผ่นรองชั้น HD A7*10หนา0.08มม', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PK0012', name: 'แผ่นแพ็คHD A18*23หนา0.08มม', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PK0013', name: 'แผ่นHD Aสีเหลือง18*23หนา0.08มม', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PK0014', name: 'แผ่นHD Aสีเขียว18*23หนา0.08มม', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PK0015', name: 'แผ่นHD Aชมพู18*23หนา0.08มม', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PK0016', name: 'แผ่นHD Aสีส้ม18*23หนา0.08มม', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PK0017', name: 'แผ่นห่อHD A8*10หนา0.08มม', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PK0018', name: 'แผ่นห่อDH A4*6หนา0.08มม', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PK0019', name: 'ไม้กลม3*5', category: 'PM', subCategory: 'Skewer', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PK0020', name: 'ไม้กลม3*6', category: 'PM', subCategory: 'Skewer', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PK0021', name: 'ไม้กลม3*7', category: 'PM', subCategory: 'Skewer', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PK0022', name: 'ไม้ชายธงเบอร์6', category: 'PM', subCategory: 'Skewer', unit: 'ถุง', status: 'Active' },
+    { id: 'PK0023', name: 'สติ๊กเกอร์ติดข้างกล่อง MK', category: 'PM', subCategory: 'Sticker', unit: 'ดวง', status: 'Active' },
+    { id: 'PK0024', name: 'สติ๊กเกอร์ติดแพ็คเก็จจิ้ง MK', category: 'PM', subCategory: 'Sticker', unit: 'ดวง', status: 'Active' },
+    { id: 'PK0025', name: 'สติ๊กเกอร์ (ข้าว)', category: 'PM', subCategory: 'Sticker', unit: 'ดวง', status: 'Active' },
+    { id: 'PK0026', name: 'ถุงHD A10*16  พิมพ์ไก่พริกไทยดำ', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PK0027', name: 'ถุงHD A10*16  พิมพ์ไก่แดง', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PK0028', name: 'ถุงHD A10*16  พิมพ์ไก่นมสด', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PK0029', name: 'ไม้กลม2.5*6', category: 'PM', subCategory: 'Skewer', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PK0030', name: 'ถุงNYLON+LL 300*400mm.*80cm ซีล 3 ด้าน', category: 'PM', subCategory: 'Packaging', unit: 'ใบ', status: 'Active' },
+    { id: 'PK0031', name: 'สติ๊กเกอร์ติดข้างกล่อง หมูนมสด-GHS', category: 'PM', subCategory: 'Sticker', unit: 'ดวง', status: 'Active' },
+    { id: 'PK0032', name: 'สติ๊กเกอร์ติดแพคเกจจิ้ง หมูนมสด-GHS', category: 'PM', subCategory: 'Sticker', unit: 'ดวง', status: 'Active' },
+    { id: 'PK0033', name: 'สติ๊กเกอร์ติดข้างกล่อง BBQ', category: 'PM', subCategory: 'Sticker', unit: 'ดวง', status: 'Active' },
+    { id: 'PK0034', name: 'สติ๊กเกอร์ติดแพคเกจจิ้ง BBQ', category: 'PM', subCategory: 'Sticker', unit: 'ดวง', status: 'Active' },
+    { id: 'PK0036', name: 'ถุงNYLON+LL 220*240mm.*80mi ซีล 3 ด้าน', category: 'PM', subCategory: 'Packaging', unit: 'ใบ', status: 'Active' },
+    { id: 'PK0037', name: 'ถุงNYLON+LL 205*305mm.*80mi ซีล 3 ด้าน', category: 'PM', subCategory: 'Packaging', unit: 'ใบ', status: 'Active' },
+    { id: 'PK0038', name: 'กล่องลูกฟูก5ชั้น ขนาด230*400*170', category: 'PM', subCategory: 'Packaging', unit: 'ใบ', status: 'Active' },
+    { id: 'PK0040', name: 'สติ๊กเกอร์ข้างกล่อง หมูปิ้งหมักสูตรโบราณ aro', category: 'PM', subCategory: 'Sticker', unit: 'ดวง', status: 'Active' },
+    { id: 'PK0041', name: 'สติ๊กเกอร์ข้างกล่อง หมูสะเต๊ะพร้อมปรุงเสียบไม้ aro', category: 'PM', subCategory: 'Sticker', unit: 'ดวง', status: 'Active' },
+    { id: 'PK0042', name: 'สติ๊กเกอร์ข้างกล่อง หมูปิ้งนมสดสูตรเข้มข้น aro', category: 'PM', subCategory: 'Sticker', unit: 'ดวง', status: 'Active' },
+    { id: 'PK0043', name: 'สติ๊กเกอร์แพคเกจจิ้ง หมูปิ้งหมักสูตรโบราณ aro', category: 'PM', subCategory: 'Sticker', unit: 'ดวง', status: 'Active' },
+    { id: 'PK0044', name: 'สติ๊กเกอร์แพคเกจจิ้ง หมูสะเต๊ะพร้อมปรุงเสียบไม้ aro', category: 'PM', subCategory: 'Sticker', unit: 'ดวง', status: 'Active' },
+    { id: 'PK0045', name: 'สติ๊กเกอร์แพคเกจจิ้ง หมูปิ้งนมสดสูตรเข้มข้น aro', category: 'PM', subCategory: 'Sticker', unit: 'ดวง', status: 'Active' },
+    { id: 'PK0046', name: 'ถุงHD A10*16  พิมพ์หมูแดดเดียว', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'PK0053', name: 'ถุงHD 11*17 (ไม่พิมพ์โลโก้)', category: 'PM', subCategory: 'Packaging', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'CM0001', name: 'CL - NEXGEN PH-1000', category: 'CM', subCategory: 'Cleaning', unit: 'ลิตร', status: 'Active' },
+    { id: 'CM0002', name: 'SN - คลอรีนน้ำ 10%', category: 'CM', subCategory: 'Sanitizing', unit: 'กิโลกรััม', status: 'Active' },
+    { id: 'CM0003', name: 'CL - ENRICH D028', category: 'CM', subCategory: 'Cleaning', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'CM0004', name: 'SN - NEXGEN ALCO 70B', category: 'CM', subCategory: 'Sanitizing', unit: 'ลิตร', status: 'Active' },
+    { id: 'CM0006', name: 'SN - NEXGEN SAN 800', category: 'CM', subCategory: 'Sanitizing', unit: 'กิโลกรัม', status: 'Active' },
+    { id: 'CM0007', name: 'CL - NEXGEN MP-1000', category: 'CM', subCategory: 'Cleaning', unit: 'กิโลกรัม', status: 'Active' }
+  ],
+  /* === INGREDIENTS === 38 records from ingredient_master */
+  ingredients: [
+    { id: 'PD0001', name: 'ซอสหอยนางรมหมู', category: 'Seasoning', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0002', name: 'ซอสหอยนางรมไก่', category: 'Seasoning', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0003', name: 'ซอสปรุงรสฝาเขียว', category: 'Seasoning', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0004', name: 'ซีอิ้วขาว  สูตร 1', category: 'Seasoning', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Low' },
+    { id: 'PD0005', name: 'ซีอิ้วดำฉลากส้ม', category: 'Ingredient', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0006', name: 'ซีอิ้วขาวเห็ดหอม', category: 'Seasoning', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Low' },
+    { id: 'PD0007', name: 'ผงปรุงรส', category: 'Seasoning', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Low' },
+    { id: 'PD0008', name: 'ผงชูรส', category: 'Seasoning', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0009', name: 'แป้งท้าว', category: 'Seasoning', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0010', name: 'เกลือ', category: 'Ingredient', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0011', name: 'กระเทียม', category: 'Seasoning', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0012', name: 'พริกไทยดำ', category: 'Seasoning', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0013', name: 'พริกไทยขาว', category: 'Seasoning', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0014', name: 'เมล็ดผักชี', category: 'Seasoning', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0015', name: 'ผงขมิ้น', category: 'Seasoning', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0016', name: 'ผงกระเทียม', category: 'Seasoning', unit: 'กรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0017', name: 'น้ำตาลมะพร้าวหมู', category: 'Ingredient', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0018', name: 'น้ำตาลมะพร้าวไก่', category: 'Ingredient', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0019', name: 'นมจืด', category: 'Ingredient', unit: 'กระป๋อง', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0020', name: 'สีส้มแดง', category: 'Additive', unit: 'กรัม', storageTemp: '25-30 C', risk: 'Low' },
+    { id: 'PD0021', name: 'สีเหลืองไข่', category: 'Additive', unit: 'กรัม', storageTemp: '25-30 C', risk: 'Low' },
+    { id: 'PD0022', name: 'โซดา', category: 'Additive', unit: 'ขวด', storageTemp: '25-30 C', risk: 'Low' },
+    { id: 'PD0023', name: 'ฟอสเฟต', category: 'Additive', unit: 'กรัม', storageTemp: '25-30 C', risk: 'Low' },
+    { id: 'PD0024', name: 'แป้งมัน', category: 'Ingredient', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0025', name: 'วุ้นเส้น', category: 'Ingredient', unit: 'กรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0026', name: 'ข้าวเจ้า', category: 'Ingredient', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0027', name: 'ซอสบาร์บีคิว', category: 'Seasoning', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0028', name: 'ซอสพริก', category: 'Seasoning', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0029', name: 'เบคกิ้งโซดา', category: 'Additive', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Low' },
+    { id: 'PD0030', name: 'ผงสามเกลอ', category: 'Seasoning', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0031', name: 'พริกขี้หนูป่น', category: 'Seasoning', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0032', name: 'ผงพริกหม่าล่า', category: 'Seasoning', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0033', name: 'ผงกะหรี่', category: 'Seasoning', unit: 'กิโลกรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0034', name: 'น้ำมันงา', category: 'Seasoning', unit: 'ลิตร', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0035', name: 'น้ำปลา', category: 'Seasoning', unit: 'ลิตร', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0036', name: 'ซอสโชยุ', category: 'Seasoning', unit: 'กรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0037', name: 'ซอสเทอริยากิ', category: 'Seasoning', unit: 'กรัม', storageTemp: '25-30 C', risk: 'Medium' },
+    { id: 'PD0038', name: 'งาขาว', category: 'Seasoning', unit: 'กรัม', storageTemp: '25-30 C', risk: 'Medium' }
+  ],
+  /* === PACKAGING === 60 records from packaging_master */
+  packaging: [
+    { id: 'PK0001', name: 'กล่องลูกฟูก5ชั้น ขนาด287*385*305', unit: 'ใบ', risk: 'Medium' },
+    { id: 'PK0002', name: 'กล่องลูกฟูก5ชั้น ขนาด23*40*21.2', unit: 'ใบ', risk: 'Medium' },
+    { id: 'PK0003', name: 'กล่องโฟม 25', unit: 'ใบ', risk: 'Medium' },
+    { id: 'PK0004', name: 'กล่องโฟม 3 กก', unit: 'ใบ', risk: 'Medium' },
+    { id: 'PK0005', name: 'ถุงHD A19*12(แผ่นแพ็ค)', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PK0006', name: 'ถุงHD/A10*16หนา0.08มม.คู่ไม่พิมพ์โลโก้', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PK0007', name: 'ถุงHD A10*16หนา พิมพ์โลโก้', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PK0008', name: 'ถุงNYLON+LL 220mm*300mm ซีล 3ด้าน', unit: 'ใบ', risk: 'Low' },
+    { id: 'PK0009', name: 'ถุงHD 11*17 พิมพ์โลโก้หมูนมสด size s', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PK0010', name: 'เทปใส', unit: 'ม้วน', risk: 'Low' },
+    { id: 'PK0011', name: 'แผ่นรองชั้น HD A7*10หนา0.08มม', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PK0012', name: 'แผ่นแพ็คHD A18*23หนา0.08มม', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PK0013', name: 'แผ่นHD Aสีเหลือง18*23หนา0.08มม', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PK0014', name: 'แผ่นHD Aสีเขียว18*23หนา0.08มม', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PK0015', name: 'แผ่นHD Aชมพู18*23หนา0.08มม', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PK0016', name: 'แผ่นHD Aสีส้ม18*23หนา0.08มม', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PK0017', name: 'แผ่นห่อHD A8*10หนา0.08มม', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PK0018', name: 'แผ่นห่อDH A4*6หนา0.08มม', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PK0019', name: 'ไม้กลม3*5', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PK0020', name: 'ไม้กลม3*6', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PK0021', name: 'ไม้กลม3*7', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PK0022', name: 'ไม้ชายธงเบอร์6', unit: 'ถุง', risk: 'Low' },
+    { id: 'PK0023', name: 'สติ๊กเกอร์ติดข้างกล่อง MK', unit: 'ดวง', risk: 'Low' },
+    { id: 'PK0024', name: 'สติ๊กเกอร์ติดแพ็คเก็จจิ้ง MK', unit: 'ดวง', risk: 'Low' },
+    { id: 'PK0025', name: 'สติ๊กเกอร์ (ข้าว)', unit: 'ดวง', risk: 'Low' },
+    { id: 'PK0026', name: 'ถุงHD A10*16  พิมพ์ไก่พริกไทยดำ', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PK0027', name: 'ถุงHD A10*16  พิมพ์ไก่แดง', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PK0028', name: 'ถุงHD A10*16  พิมพ์ไก่นมสด', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PK0029', name: 'ไม้กลม2.5*6', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PK0030', name: 'ถุงNYLON+LL 300*400mm.*80cm ซีล 3 ด้าน', unit: 'ใบ', risk: 'Low' },
+    { id: 'PK0031', name: 'สติ๊กเกอร์ติดข้างกล่อง หมูนมสด-GHS', unit: 'ดวง', risk: 'Low' },
+    { id: 'PK0032', name: 'สติ๊กเกอร์ติดแพคเกจจิ้ง หมูนมสด-GHS', unit: 'ดวง', risk: 'Low' },
+    { id: 'PK0033', name: 'สติ๊กเกอร์ติดข้างกล่อง BBQ', unit: 'ดวง', risk: 'Low' },
+    { id: 'PK0034', name: 'สติ๊กเกอร์ติดแพคเกจจิ้ง BBQ', unit: 'ดวง', risk: 'Low' },
+    { id: 'PK0036', name: 'ถุงNYLON+LL 220*240mm.*80mi ซีล 3 ด้าน', unit: 'ใบ', risk: 'Low' },
+    { id: 'PK0037', name: 'ถุงNYLON+LL 205*305mm.*80mi ซีล 3 ด้าน', unit: 'ใบ', risk: 'Low' },
+    { id: 'PK0038', name: 'กล่องลูกฟูก5ชั้น ขนาด230*400*170', unit: 'ใบ', risk: 'Low' },
+    { id: 'PK0040', name: 'สติ๊กเกอร์ข้างกล่อง หมูปิ้งหมักสูตรโบราณ aro', unit: 'ดวง', risk: 'Low' },
+    { id: 'PK0041', name: 'สติ๊กเกอร์ข้างกล่อง หมูสะเต๊ะพร้อมปรุงเสียบไม้ aro', unit: 'ดวง', risk: 'Low' },
+    { id: 'PK0042', name: 'สติ๊กเกอร์ข้างกล่อง หมูปิ้งนมสดสูตรเข้มข้น aro', unit: 'ดวง', risk: 'Low' },
+    { id: 'PK0043', name: 'สติ๊กเกอร์แพคเกจจิ้ง หมูปิ้งหมักสูตรโบราณ aro', unit: 'ดวง', risk: 'Low' },
+    { id: 'PK0044', name: 'สติ๊กเกอร์แพคเกจจิ้ง หมูสะเต๊ะพร้อมปรุงเสียบไม้ aro', unit: 'ดวง', risk: 'Low' },
+    { id: 'PK0045', name: 'สติ๊กเกอร์แพคเกจจิ้ง หมูปิ้งนมสดสูตรเข้มข้น aro', unit: 'ดวง', risk: 'Low' },
+    { id: 'PK0046', name: 'ถุงHD A10*16  พิมพ์หมูแดดเดียว', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PK0053', name: 'ถุงHD 11*17 (ไม่พิมพ์โลโก้)', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PG0001', name: 'ถุงหูหิ้ว9*18', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PG0002', name: 'ถุงหูหิ้ว12*20', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PG0003', name: 'ถุงหูหิ้ว12*18', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PG0004', name: 'ถุงใส6*9', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PG0005', name: 'ถุงขยะดำ 24*28*20mm', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PG0006', name: 'ถุงขยะสีชา', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PG0009', name: 'รองเท้าบูทยางสีขาว เบอร์ 11', unit: 'คู่', risk: 'Low' },
+    { id: 'PG0010', name: 'รองเท้าบูทสีขาว เบอร์12', unit: 'คู่', risk: 'Low' },
+    { id: 'PG0011', name: 'เอี๋ยมน้ำเงิน', unit: 'ผืน', risk: 'Low' },
+    { id: 'PG0012', name: 'ถุงมือยางสีน้ำเงิน/S', unit: 'กล่อง', risk: 'Low' },
+    { id: 'PG0013', name: 'ถุงมือยางสีน้ำเงิน/M', unit: 'กล่อง', risk: 'Low' },
+    { id: 'PG0014', name: 'ถุงมือยางสีน้ำเงิน/L', unit: 'กล่อง', risk: 'Low' },
+    { id: 'PG0015', name: 'ถุงHD A11"x17" หนา 0.12 มม./คู่', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PG0016', name: 'ถุง HD  A14"x25" หนา 0.12 มม./คู่ (สีขาว)', unit: 'กิโลกรัม', risk: 'Low' },
+    { id: 'PG0018', name: 'ถุง HD  A14"x25" หนา 0.12 มม./คู่ (สีฟ้า)', unit: 'กิโลกรัม', risk: 'Low' }
+  ],
+  /* === CHEMICALS === 6 records from chemical_master */
+  chemicals: [
+    { id: 'CM - 001', name: 'CL - Liquid Soap', unit: 'Gallon', risk: 'Medium' },
+    { id: 'CM - 002', name: 'SN - คลอรีนน้ำ 10%', unit: 'Kg', risk: 'Medium' },
+    { id: 'CM - 003', name: 'CL - Enrich D028', unit: 'Kg', risk: 'Medium' },
+    { id: 'CM - 004', name: 'SN - ALCOHOL 75%', unit: 'L', risk: 'Medium' },
+    { id: 'CM - 006', name: 'SN - QAC (Q-San M)', unit: 'Kg', risk: 'Medium' },
+    { id: 'CM - 007', name: 'CL - NEXGEN MP-1000', unit: 'Kg', risk: 'Medium' }
+  ],
+  /* === FINISHED GOODS === 32 records */
+  finishedGoods: [
+    { id: 'FG - ม002', name: 'หมูปิ้งนมสดเสียบไม้ - Size L', type: 'Pork Marinated', storageTemp: -18, shelfLife: 365, minWeight: 50, maxWeight: 52, minPack: 2500, maxPack: 2600, status: 'Active' },
+    { id: 'FG - ม003', name: 'หมูปิ้งนมสดเสียบไม้ - Size S', type: 'Pork Marinated', storageTemp: -18, shelfLife: 365, minWeight: 25, maxWeight: 26, minPack: 2500, maxPack: 2600, status: 'Active' },
+    { id: 'FG - ม004', name: 'หมูปิ้งนมสดเสียบไม้ - พาย', type: 'Pork Marinated', storageTemp: -18, shelfLife: 365, minWeight: 50, maxWeight: 52, minPack: 2500, maxPack: 2600, status: 'Active' },
+    { id: 'FG - ม005', name: 'หมูปิ้งนมสดเสียบไม้ Size L พร้อมทาน', type: 'Pork Marinated', storageTemp: -18, shelfLife: 365, minWeight: 45, maxWeight: 46, minPack: 2500, maxPack: 2600, status: 'Active' },
+    { id: 'FG - ม006', name: 'หมูปิ้งนมสดแช่แข็ง 25 ก x 40 ไม้ x 20 แพ็ก / ลัง (MK)', type: 'Pork Marinated', storageTemp: -18, shelfLife: 365, minWeight: 25, maxWeight: 26, minPack: 950, maxPack: 1050, status: 'Active' },
+    { id: 'FG - ม007', name: 'หมูปิ้งนมสดแช่แข็ง 45 ก x 40 ไม้ x 10 แพ็ก / ลัง (GHS)', type: 'Pork Marinated', storageTemp: -18, shelfLife: 365, minWeight: 45, maxWeight: 46, minPack: 1800, maxPack: 1850, status: 'Active' },
+    { id: 'FG - ม008', name: 'GHS หมูปิ้งนมสดฉลากขาว 45ก.x40ไม้x10 แพ็ก', type: 'Pork Marinated', storageTemp: -18, shelfLife: 365, minWeight: 45, maxWeight: 46, minPack: 1800, maxPack: 1850, status: 'Active' },
+    { id: 'FG - ม010', name: 'หมูแดดเดียว', type: 'Pork Marinated', storageTemp: -18, shelfLife: 365, minWeight: 35, maxWeight: 37, status: 'Active' },
+    { id: 'FG - ม011', name: 'หมูปิ้งโบราณ Size L', type: 'Pork Marinated', storageTemp: -18, shelfLife: 365, status: 'Active' },
+    { id: 'FG - ม013', name: 'หมูปิ้งโบราณ Size S', type: 'Pork Marinated', storageTemp: -18, shelfLife: 365, status: 'Active' },
+    { id: 'FG - ม014', name: 'หมูปิ้งโบราณแช่แข็ง 16 ก x 40 ไม้ x 24 แพ็ก / ลัง (MK)', type: 'Pork Marinated', storageTemp: -18, shelfLife: 365, status: 'Active' },
+    { id: 'FG - ม024', name: 'หมูหมักบาร์บีคิวเสียบไม้แช่แข็ง 50 ก x 30 ไม้', type: 'Pork Marinated', storageTemp: -18, shelfLife: 365, status: 'Active' },
+    { id: 'FG - ม025', name: 'หมูปิ้งโบราณแช่แข็ง 16 ก x 50 ไม้ ( สูตร 2 )', type: 'Pork Marinated', storageTemp: -18, shelfLife: 365, status: 'Active' },
+    { id: 'FG - ม026', name: 'หมูสะเต๊ะแช่แข็ง 13 ก x 50 ไม้', type: 'Pork Marinated', storageTemp: -18, shelfLife: 365, status: 'Active' },
+    { id: 'FG - ม027', name: 'หมูหม่าล่าแช่แข็ง 16 ก x 50 ไม้', type: 'Pork Marinated', storageTemp: -18, shelfLife: 365, status: 'Active' },
+    { id: 'FG - ม028', name: 'Repack หมูสะเต๊ะแช่แข็ง 30 ก x 50 ไม้', type: 'Pork Marinated', storageTemp: -18, shelfLife: 365, status: 'Active' },
+    { id: 'FG - ม029', name: 'Repack หมูหม่าล่าแช่แข็ง 24 ก x 50 ไม้', type: 'Pork Marinated', storageTemp: -18, shelfLife: 365, status: 'Active' },
+    { id: 'FG - ล001', name: 'ลูกชิ้นหมู', type: 'Meat Ball', storageTemp: -18, shelfLife: 365, minPack: 2000, maxPack: 2200, status: 'Active' },
+    { id: 'FG - ล003', name: 'ลูกชิ้นเอ็นหมู', type: 'Meat Ball', storageTemp: -18, shelfLife: 365, minPack: 2000, maxPack: 2200, status: 'Active' },
+    { id: 'FG - ส001', name: 'ไส้กรอกวุ้นเส้น', type: 'Esan Sausage', storageTemp: -18, shelfLife: 365, status: 'Active' },
+    { id: 'FG - ส002', name: 'ไส้กรอกดั้งเดิม', type: 'Esan Sausage', storageTemp: -18, shelfLife: 365, status: 'Active' },
+    { id: 'FG - ส003', name: 'ไส้กรอกเปรี้ยว', type: 'Esan Sausage', storageTemp: -18, shelfLife: 365, status: 'Active' },
+    { id: 'FG - ก001', name: 'ไก่แดงโบราณ', type: 'Chicken Marinated', storageTemp: -18, shelfLife: 365, status: 'Active' },
+    { id: 'FG - ก001 MPS', name: 'ไก่พริกไทยดำเสียบไม้ แพ็กละ10ไม้', type: 'Chicken Marinated', storageTemp: -18, shelfLife: 365, status: 'Active' },
+    { id: 'FG - ก002', name: 'ไก่พริกไทยดำ', type: 'Chicken Marinated', storageTemp: -18, shelfLife: 365, minWeight: 50, maxWeight: 52, minPack: 2500, maxPack: 2600, status: 'Active' },
+    { id: 'FG - ก003', name: 'ไก่ปิ้งนมสด', type: 'Chicken Marinated', storageTemp: -18, shelfLife: 365, minWeight: 50, maxWeight: 52, minPack: 2500, maxPack: 2600, status: 'Active' },
+    { id: 'FG - ก004', name: 'ไก่เทอริยากิ 55 ก x 50 ไม้', type: 'Chicken Marinated', storageTemp: -18, shelfLife: 365, minWeight: 50, maxWeight: 52, minPack: 2500, maxPack: 2600, status: 'Active' },
+    { id: 'FG - ก005', name: 'ไก่หม่าล่า 55 ก x 50 ไม้', type: 'Chicken Marinated', storageTemp: -18, shelfLife: 365, minWeight: 50, maxWeight: 52, minPack: 2500, maxPack: 2600, status: 'Active' },
+    { id: 'FG - ก006', name: 'ไก่บาร์บีคิว 55 ก x 40 ไม้', type: 'Chicken Marinated', storageTemp: -18, shelfLife: 365, minWeight: 50, maxWeight: 52, minPack: 2500, maxPack: 2600, status: 'Active' },
+    { id: 'FG - ข001', name: 'ข้าวเหนียว', type: 'Rice', storageTemp: 'Ambient', shelfLife: 270, minWeight: 5000, maxWeight: 5000, minPack: 5000, maxPack: 5000, status: 'Active' },
+    { id: 'FG - ม002 Tops', name: 'Tops หมูปิ้งนมสดพร้อมทาน', type: 'Pork Marinated', storageTemp: -18, shelfLife: 365, minWeight: 410, maxWeight: 450, minPack: 410, maxPack: 450, status: 'Active' },
+    { id: 'FG - ก001 Tops', name: 'Tops ไก่แดงโบราณพร้อมทาน', type: 'Chicken Marinated', storageTemp: -18, shelfLife: 365, minWeight: 410, maxWeight: 450, minPack: 410, maxPack: 450, status: 'Active' }
+  ],
+  /* === PROCESSES === 25 records */
+  processes: [
+    { id: 'PC0001', name: 'การรับเข้าวัตถุดิบ', step: 1, description: 'จุดตรวจสอบและรับเนื้อหมู เครื่องปรุง หรือบรรจุภัณฑ์', area: 'จุดรับวัตถุดิบ RM, DM, PM, CM', isCCP: false },
+    { id: 'PC0002', name: 'การจัดเก็บวัตถุดิบ', step: 2, description: 'การเก็บรักษาวัตถุดิบก่อนเบิกไปใช้ (เช่น ห้องเย็น)', area: 'ห้องแช่เย็น จัดเก็บ RM', isCCP: false },
+    { id: 'PC0003', name: 'การตัดและตกแต่ง', step: 3, description: 'การหั่นเนื้อหมู เลาะพังผืด หรือตัดแต่งขนาด', area: 'จุุดตัดแต่ง ห้องผลิต', isCCP: false },
+    { id: 'PC0004', name: 'การชั่งน้ำหนักส่วนผสมตามสูตร', step: 4, description: 'การชั่งตวงส่วนผสมให้ได้สัดส่วนตามสูตร (Recipe)', area: 'ห้องชั่งสาร', isCCP: false },
+    { id: 'PC0005', name: 'การลดขนาดวัตถุดิบ ครั้งที่ 1', step: 5, description: 'การลดขนาดวัตถุดิบให้มีชิ้นเล็กลงตามขนาดของตัวเครื่องและใบมีด', area: 'ห้องผลิิต', isCCP: false },
+    { id: 'PC0006', name: 'การลดขนาดวัตถุดิบ ครั้งที่ 2', step: 6, description: 'การลดขนาดวัตถุดิบให้มีชิ้นเล็กลงตามขนาดของตัวเครื่องและใบมีด', area: 'ห้องผลิิต', isCCP: false },
+    { id: 'PC0007', name: 'การลดขนาดวัตถุดิบ ครั้งที่ 3', step: 7, description: 'การลดขนาดวัตถุดิบให้มีชิ้นเล็กลงตามขนาดของตัวเครื่องและใบมีด', area: 'ห้องผลิิต', isCCP: false },
+    { id: 'PC0008', name: 'การผสมและการหมัก', step: 8, description: 'การคลุกเคล้าเนื้อหมูกับเครื่องปรุงและหมักทิ้งไว้', area: 'ห้องผลิต', isCCP: true },
+    { id: 'PC0009', name: 'การเสียบไม้และขึ้นรูป', step: 9, description: 'การนำเนื้อหมูมาเสียบไม้และจัดทรงให้ได้มาตรฐาน', area: 'ห้องผลิต', isCCP: false },
+    { id: 'PC0010', name: 'การให้ความร้อนวัตถุดิบ (สุก)', step: 10, description: 'กระบวนการให้ความร้อน (หากเป็นสินค้าแบบปรุงสุก)', area: 'ห้องผลิต (ไลน์สุก)', isCCP: true },
+    { id: 'PC0011', name: 'การลดอุณหภูมิ', step: 11, description: 'การพักสินค้าให้เย็นลงก่อนนำไปแพ็คหรือแช่แข็ง', area: 'ห้องผลิต', isCCP: false },
+    { id: 'PC0012', name: 'การตรวจจับโลหะ', step: 12, description: 'จุดตรวจสอบหาสิ่งเจือปนที่เป็นโลหะ (จุด CCP ที่สำคัญ)', area: 'ห้องผลิต', isCCP: true },
+    { id: 'PC0013', name: 'การบรรจุ/ซีล/ติดฉลาก', step: 13, description: 'การนำสินค้าลงถุง ซีลปิดปากถุง และติดฉลาก', area: 'ห้องบรรจุ แพ็กสินค้า', isCCP: false },
+    { id: 'PC0014', name: 'การแช่แข็ง', step: 14, description: 'การนำสินค้าเข้าอุโมงค์ลมเย็น (Air Blast) เพื่อแช่แข็ง', area: 'ห้องแช่เยือกแข็ง แบบรวดเร็ว', isCCP: false },
+    { id: 'PC0015', name: 'การจัดเก็บสินค้าแช่แข็ง', step: 15, description: 'การเก็บสินค้าสำเร็จรูปในห้องจัดเก็บอุณหภูมิ ≤-18°C', area: 'ห้องแช่เยือกแข็็ง จัดเก็บ FG', isCCP: false },
+    { id: 'PC0016', name: 'การจ่ายสินค้า/การจัดส่ง', step: 16, description: 'การโหลดสินค้าขึ้นรถเพื่อกระจายไปยังลูกค้า', area: 'จุดโหลดสินค้า', isCCP: false },
+    { id: 'PC0017', name: 'การทดลองเดินเครื่อง/ทดลองผลิต', step: 17, description: 'การทดสอบระบบหรือผลิตสินค้านำร่องก่อนผลิตจริง ประจำวัน', area: 'ห้องผลิต', isCCP: false },
+    { id: 'PC0018', name: 'การทดสอบชิมผลิตภัณฑ์', step: 18, description: 'การนำผลิตภัณฑ์มาทดสอบชิม', isCCP: false },
+    { id: 'PC0019', name: 'การตรวจสอบเชื้อจุลินทรีย์ก่อโรค', step: 19, isCCP: false },
+    { id: 'PC0020', name: 'การตรวจวัดคุณภาพน้ำ', step: 20, isCCP: false },
+    { id: 'PC0021', name: 'การตรวจวััดความเข้มข้นสารละลาย', step: 21, isCCP: false },
+    { id: 'PC0022', name: 'การล้างควบคุมสารก่อภูมิแพ้ (Allergen)', step: 22, isCCP: false },
+    { id: 'PC0023', name: 'การตรวจสภาพแวดล้อมและความปลอดภัย (OH&S)', step: 23, isCCP: false },
+    { id: 'PC0024', name: 'การตรวจประเมินด้านแรงงาน (ESG)', step: 24, isCCP: false },
+    { id: 'PC0025', name: 'การศึกษาอายุผลิตภัณฑ์ (Shelf-life Study)', step: 25, isCCP: false }
+  ],
+  /* === PARAMETERS === 32 records — control parameters / spec limits */
+  parameters: [
+    { id: 'PR0001', name: 'อุณหภูมิรถขนส่ง (เฉพาะกลุ่ม RM)', description: 'อุณหภูมิของรถขนส่งวัตถุดิบ ณ จุดที่ตรวจ', category: 'Temperature', spec: '0 - 4', unit: '°C' },
+    { id: 'PR0002', name: 'ค่า pH รับเข้าเนื้อสัตว์', description: 'ค่า pH รัับเข้าของวัตถุดิบ', category: 'Quality', spec: '5.5 - 5.8', unit: '-' },
+    { id: 'PR0003', name: 'อุณหภูมิแกนกลางวัตถุดิบ FG (สุุก)', description: 'อุณหภูมิจุดกึ่งกลางของชิ้นสินค้า', category: 'Temperature', spec: '≥ 75', unit: '°C' },
+    { id: 'PR0004', name: 'อุณหภูมิแกนกลางวัตถุดิบ RM', description: 'อุณหภูมิจุดกึ่งกลางของชิ้นสินค้า', category: 'Temperature', spec: '0 - 7', unit: '°C' },
+    { id: 'PR0005', name: 'อุณหภูมิห้องผลิต', description: 'อุณหภูมิของพื้นที่ปฏิบัติงาน (เช่น ห้องผลิต, ห้องบรรจุ)', category: 'Temperature', spec: '≤ 12', unit: '°C' },
+    { id: 'PR0006', name: 'อุณหภูมิห้องแช่เย็น', description: 'อุณหภูมิของตู้จัดเก็บหรือห้องแช่เย็น', category: 'Temperature', spec: '(-4) - 4', unit: '°C' },
+    { id: 'PR0007', name: 'อุณหภูมิห้องแช่แข็ง', description: 'อุณหภูมิของตู้จัดเก็บหรือห้องแช่่เยือกแข็ง', category: 'Temperature', spec: '≤ -18', unit: '°C' },
+    { id: 'PR0008', name: 'ตรวจจับโลหะ (เหล็ก)', description: 'เครื่องตรวจจับโลหะประเภท Ferrous (โลหะที่มีสารแม่เหล็ก/เหล็ก)', category: 'Food Safety', spec: 'ø 1.0', unit: 'มิลลิเมตร' },
+    { id: 'PR0009', name: 'ตรวจจับโลหะ (อลูมิเนียม ทองแดง ทองเหลือง)', description: 'เครื่องตรวจจับโลหะประเภท Non-Ferrous (เช่น อลูมิเนียม, ทองแดง, ทองเหลือง)', category: 'Food Safety', spec: 'ø 1.5', unit: 'มิลลิเมตร' },
+    { id: 'PR0010', name: 'ตรวจจับโลหะ (สแตนเลส)', description: 'เครื่องตรวจจับโลหะประเภท Stainless Steel (สแตนเลส)', category: 'Food Safety', spec: 'ø 2.0', unit: 'มิลลิเมตร' },
+    { id: 'PR0011', name: 'ขนาดของวัตถุดิบ (ใบมีดใหญ่)', description: 'ขนาดของวัตถุดิบหลังผ่านเครื่องสไลด์', category: 'Quality', spec: 'ø 24.5 - 25.0', unit: 'มิลลิเมตร' },
+    { id: 'PR0012', name: 'ขนาดของวัตถุดิบ (ใบมีดเล็ก)', description: 'ขนาดของวัตถุดิบหลังผ่านเครื่องสไลด์', category: 'Quality', spec: 'ø 2.2 - 2.5', unit: 'มิลลิเมตร' },
+    { id: 'PR0013', name: 'น้ำหนัก/ไม้', description: 'ความคลาดเคลื่อนของน้ำหนัก (เช่น น้ำหนักรายชิ้น)', category: 'Weight', spec: 'within tolerance', unit: 'กรัม / กิโลกรัม' },
+    { id: 'PR0014', name: 'น้ำหนักสุทธิ / รวม', description: 'น้ำหนักรวมของสินค้าในบรรจุภัณฑ์', category: 'Weight', spec: 'within tolerance', unit: 'กรัม / กิโลกรัม' },
+    { id: 'PR0015', name: 'จำนวนไม้', description: 'จำนวนไม้ของสินค้าในบรรจุภัณฑ์', category: 'Visual', spec: 'อ้างอิง Spec. ผลิตภัณฑ์', unit: '-' },
+    { id: 'PR0016', name: 'ลักษณะปรากฏ', description: 'รูปลักษณ์ หรือสิ่งที่ปรากฎภายนอกโดยรวม', category: 'Quality', spec: 'ปกติ', unit: '-' },
+    { id: 'PR0017', name: 'สิ่งแปลกปลอม (เส้นผม พลาสติก แมลง)', description: 'สิ่งเจือปนที่ไม่อนุญาตให้มี (เช่น เส้นผม, พลาสติก, แมลง)', category: 'Quality', spec: 'ไม่พบสิ่งแปลกปลอม', unit: '-' },
+    { id: 'PR0018', name: 'Physical check (สี , กลิ่น , เนื้อสัมผัส)', description: 'สี กลิ่น เนื้อสัมผัสของผลิตภัณฑ์ต้องตรงตามมาตรฐานที่กำหนด', category: 'Quality', spec: 'ตรงตามมาตรฐาน', unit: '-' },
+    { id: 'PR0019', name: 'ความสมบูรณ์ของรอยซีล', description: 'ไม่มีความเสียหาย ไม่รั่วซึม รอยซีลสมบูรณ์', category: 'Visual', spec: 'ไม่เสียหาย / ไม่รั่วซึม', unit: '-' },
+    { id: 'PR0020', name: 'ฉลาก และสติ๊กเกอร์', description: 'ถูกต้อง ครบถ้วน อ่านได้ชัดเจน', category: 'Visual', spec: 'ข้อมูลถูกต้อง / ชัดเจน', unit: '-' },
+    { id: 'PR0021', name: 'เอกสาร', description: 'ถูกต้อง ครบถ้วน ณ วันส่งมอบ', category: 'Process', spec: 'ข้อมูลถูกต้อง ครบถ้วน', unit: '-' },
+    { id: 'PR0022', name: 'เวลาในการทำให้อาหารสุก', description: 'ระยะเวลาในการให้ความร้อน', category: 'Process', spec: 'อ้างอิง QP', unit: '-' },
+    { id: 'PR0023', name: 'ค่า pH ตรวจวัดคุณภาพน้ำ', category: 'Food Safety', spec: '6.5 - 8.5' },
+    { id: 'PR0024', name: 'ค่าคลอรีนอิสระ', category: 'Food Safety', spec: '0.2 - 0.5', unit: 'ppm.' },
+    { id: 'PR0025', name: 'ตรวจวัด Coliform', unit: 'ppm.' },
+    { id: 'PR0026', name: 'ความเข้มข้นสารละลาย QAC', spec: 200, unit: 'ppm.' },
+    { id: 'PR0027', name: 'ความเข้มข้นสารละลาย คลอรีน', spec: 200, unit: 'ppm.' },
+    { id: 'PR0028', name: 'ระดับแสงสว่าง (Light)', spec: '≥ 300 (หรือตาม จป.)', unit: 'LUX' },
+    { id: 'PR0029', name: 'ระดับเสียง (Sound)', spec: '≤ 85', unit: 'db' },
+    { id: 'PR0030', name: 'ป้ายทางออกฉุกเฉิน', spec: 'สว่าง / ใช้งานได้' },
+    { id: 'PR0031', name: 'เชื้อจุลินทรีย์ (TPC / Salmonella)', spec: 'ผ่านเกณฑ์ Thai FDA' },
+    { id: 'PR0032', name: 'Allergen Swab Test (Protein)', spec: 'ไม่พบโปรตีนตกค้าง' }
+  ],
+  /* === EQUIPMENT === 32 records — measuring & testing instruments */
+  equipment: [
+    { id: 'MDB001', name: 'เครื่องชั่งดิจิตอล พิกัด 6 กิโลกรัม (ห้องเครื่องเสียบ)', type: 'Measuring', usage: 'ชั่งน้ำหนักผลิตภัณฑ์  (น้ำหนัก / ไม้ , น้ำหนักรวม)' },
+    { id: 'MDB002', name: 'เครื่องชั่งดิจิตอล พิกัด 6 กิโลกรัม (ห้องเสียบมือ)', type: 'Measuring', usage: 'ชั่งน้ำหนักผลิตภัณฑ์  (น้ำหนัก / ไม้ , น้ำหนักรวม)' },
+    { id: 'MDB003', name: 'เครื่องชั่งดิจิตอล พิกัด 15 กิโลกรัม (ห้องชั่งสาร)', type: 'Measuring', usage: 'ชั่งน้ำหนักส่วนผสม กลุ่ม DM' },
+    { id: 'MDB004', name: 'เครื่องชั่งดิจิตอล พิกัด 15 กิโลกรัม (ห้องเครื่องเสียบ)', type: 'Measuring', usage: 'ชั่งน้ำหนักผลิตภัณฑ์  (น้ำหนัก / ไม้ , น้ำหนักรวม)' },
+    { id: 'MDB006', name: 'เครื่องชั่งดิจิตอล พิกัด 100 กิโลกรัม (จุดเตรียมวัตถุดิบ)', type: 'Measuring', usage: 'ชั่งน้ำหนักวัตถุดิบ (ก่อนลดขนาด และแบ่งบรรจุถุง)' },
+    { id: 'MDB007', name: 'เครื่องชั่งดิจิตอล พิกัด 15 กิโลกรัม (แผนกคุณภาพ)', type: 'Measuring', usage: 'สุ่มชั่งตลอดกระบวนการผลิต - QA/QC' },
+    { id: 'MDB008', name: 'เครื่องชั่งดิจิตอล พิกัด 15 กิโลกรัม (ห้องเสียบมือ)', type: 'Measuring', usage: 'ชั่งน้ำหนักผลิตภัณฑ์  (น้ำหนัก / ไม้ , น้ำหนักรวม)' },
+    { id: 'MDB009', name: 'เครื่องชั่งดิจิตอล พิกัด 150 กิโลกรัม (ห้องหมัก - ผสม)', type: 'Measuring', usage: 'ชั่งน้ำหนักวัตถุดิบ (ก่อนลดขนาด และแบ่งบรรจุถุง)' },
+    { id: 'MDB010', name: 'เครื่องชั่งดิจิตอล พิกัด 150 กิโลกรัม (จุดรับวัตถุดิบ RM)', type: 'Measuring', usage: 'ชั่งน้ำหนักวัตถุดิบ กลุ่ม RM' },
+    { id: 'MTC001', name: 'ห้องแช่เย็นควบคุมอุณหภูมิ (ห้อง RM)', type: 'Measuring', usage: 'ห้องจัดเก็บวัตถุดิบกลุ่ม RM' },
+    { id: 'MTC002', name: 'ห้องปฏิบัติงานควบคุมอุณหภูมิ (ห้องชั่งสาร)', type: 'Measuring', usage: 'ห้องปฏิบัติงาน' },
+    { id: 'MTC003', name: 'ห้องแช่เย็นควบคุมอุณหภูมิ (ห้องพักหมูหมัก)', type: 'Measuring', usage: 'ห้องจัดเก็บหมูหมักบรรจุถุง' },
+    { id: 'MTC004', name: 'ห้องปฏิบัติงานควบคุมอุณหภูมิ (ห้องผลิต)', type: 'Measuring', usage: 'ห้องปฏิบัติงาน' },
+    { id: 'MTF001', name: 'ห้องแช่เยือกแข็งควบคุมอุณหภูมิ', type: 'Measuring', usage: 'ห้อง FG 1' },
+    { id: 'MTF002', name: 'ห้องแช่เยือกแข็งควบคุมอุณหภูมิ', type: 'Measuring', usage: 'ห้อง FG 1.1' },
+    { id: 'MTF003', name: 'ห้องแช่เยือกแข็งควบคุมอุณหภูมิ', type: 'Measuring', usage: 'ห้อง FG 2' },
+    { id: 'MTF004', name: 'ห้องแช่เยือกแข็งควบคุมอุณหภูมิ', type: 'Measuring', usage: 'ห้อง FG 3' },
+    { id: 'MTF005', name: 'ห้องแช่เยือกแข็งควบคุมอุณหภูมิ', type: 'Measuring', usage: 'ห้อง Waste' },
+    { id: 'MDT001', name: 'HANNA - IC', type: 'Measuring', usage: 'วัดอุณหภูมิแกนกลางวัตถุดิบ (จุดรับวัตถุดิบ กลุ่ม RM)' },
+    { id: 'MDT002', name: 'HANNA - IP', type: 'Measuring', usage: 'วัดอุณหภูมิวัตถุดิบ / หมูหมักบน Hopper และอื่นๆในห้องผลิต' },
+    { id: 'MDT003', name: 'Data Logger', type: 'Measuring', usage: 'เก็บข้อมูลผลิตภัณฑ์' },
+    { id: 'MIT001', name: 'Infared Thermometer - QA', type: 'Measuring', usage: 'วัดอุณหภูมิรถขนส่งในกลุ่มวัตถุดิบ RM' },
+    { id: 'MIT002', name: 'Infared Thermometer - PD', type: 'Measuring', usage: 'วัดอุณหภูมิพื้นผิวผลิตภัณฑ์' },
+    { id: 'MRF001', name: 'Refractometer (Brix)', type: 'Measuring', usage: 'วัดค่าความหวานของน้ำซอสหมัก และผลิตภัณฑ์' },
+    { id: 'MRF002', name: 'Refractometer (Salt)', type: 'Measuring', usage: 'วัดค่าความเค็มของน้ำซอสหมัก และผลิตภัณฑ์' },
+    { id: 'MPH001', name: 'pH Meter 001', type: 'Measuring', usage: 'วัดค่าคุณภาพของน้ำใช้ภายในโรงงาน' },
+    { id: 'MPH002', name: 'pH Meter 002', type: 'Measuring', usage: 'วัดค่าคุณภาพของน้ำใช้ภายในโรงงาน (เครื่องสำรอง)' },
+    { id: 'TMD001', name: 'Metal Detector - S', type: 'Testing', usage: 'ทดสอบสิ่งแปลกปลอมที่ปะปนกับผลิตภัณฑ์ เครื่อง S' },
+    { id: 'TMD002', name: 'Metal Detector - L', type: 'Testing', usage: 'ทดสอบสิ่งแปลกปลอมที่ปะปนกับผลิตภัณฑ์ เครื่อง L' },
+    { id: 'VSC001', name: 'Visual Check', type: 'Visual', usage: 'ตรวจสอบด้วยสายตา' },
+    { id: 'MTS001', name: 'Test Strips ความเข้มข้นคลอรีนอิสระ 0 - 400 ppm.', type: 'Measuring', usage: 'วัดความเข้มข้นคลอรีนอิสระ (ppm.)' },
+    { id: 'MTS002', name: 'Test Strips ความเข้้มข้นสารละลาย QAC 0 - 400 ppm.', type: 'Measuring', usage: 'วัดความเข้มข้นสารละลาย QAC (ppm.)' }
+  ],
+  /* === CCP MASTER === 7 records */
+  ccps: [
+    { id: 'CCP001', processId: 'PC0012', name: 'ตรวจจับสิ่งแปลกปลอม Fe', criticalLimit: 'ø 1.0 mm.' },
+    { id: 'CCP002', processId: 'PC0012', name: 'ตรวจจับสิ่งแปลกปลอม Non Fe', criticalLimit: 'ø 1.5 mm.' },
+    { id: 'CCP003', processId: 'PC0012', name: 'ตรวจจับสิ่งแปลกปลอม SUS', criticalLimit: 'ø 2.0 mm.' },
+    { id: 'CCP021', processId: 'PC0010', name: 'ตรวจจับสิ่งแปลกปลอม Fe', criticalLimit: 'ø 1.0 mm.' },
+    { id: 'CCP022', processId: 'PC0010', name: 'ตรวจจับสิ่งแปลกปลอม Non Fe', criticalLimit: 'ø 1.5 mm.' },
+    { id: 'CCP023', processId: 'PC0010', name: 'ตรวจจับสิ่งแปลกปลอม SUS', criticalLimit: 'ø 2.0 mm.' },
+    { id: 'CCP004', processId: 'PC0008', name: 'อุณหภูมิหลังการทำให้สุก', criticalLimit: '≥ 75 °C' }
+  ],
+  /* === PROCESS-PARAMETER MAP === 21 records */
+  processParamMap: [
+    { id: 'MAP0001', processId: 'PC0001', processName: 'การรับเข้าวัตถุดิบ', parameterId: 'PR0019' },
+    { id: 'MAP0002', processId: 'PC0001', processName: 'การรับเข้าวัตถุดิบ', parameterId: 'PR0001' },
+    { id: 'MAP0003', processId: 'PC0001', processName: 'การรับเข้าวัตถุดิบ', parameterId: 'PR0004' },
+    { id: 'MAP0004', processId: 'PC0001', processName: 'การรับเข้าวัตถุดิบ', parameterId: 'PR0002' },
+    { id: 'MAP0005', processId: 'PC0001', processName: 'การรับเข้าวัตถุดิบ', parameterId: 'PR0016' },
+    { id: 'MAP0006', processId: 'PC0001', processName: 'การรับเข้าวัตถุดิบ', parameterId: 'PR0015' },
+    { id: 'MAP0007', processId: 'PC0002', processName: 'การจัดเก็บวัตถุดิบ', parameterId: 'PR0006' },
+    { id: 'MAP0008', processId: 'PC0004', processName: 'การชั่งน้ำหนัก', parameterId: 'PR0011' },
+    { id: 'MAP0009', processId: 'PC0008', processName: 'การผสมและการหมัก', parameterId: 'PR0004' },
+    { id: 'MAP0010', processId: 'PC0009', processName: 'การเสียบไม้และขึ้นรูป', parameterId: 'PR0011' },
+    { id: 'MAP0011', processId: 'PC0009', processName: 'การเสียบไม้และขึ้นรูป', parameterId: 'PR0012' },
+    { id: 'MAP0012', processId: 'PC0009', processName: 'การเสียบไม้และขึ้นรูป', parameterId: 'PR0013' },
+    { id: 'MAP0013', processId: 'PC0010', processName: 'การทำให้สุก/การปิ้งย่าง', parameterId: 'PR0003' },
+    { id: 'MAP0014', processId: 'PC0010', processName: 'การทำให้สุก/การปิ้งย่าง', parameterId: 'PR0020' },
+    { id: 'MAP0015', processId: 'PC0012', processName: 'การตรวจจับโลหะ', parameterId: 'PR0008' },
+    { id: 'MAP0016', processId: 'PC0012', processName: 'การตรวจจับโลหะ', parameterId: 'PR0009' },
+    { id: 'MAP0017', processId: 'PC0012', processName: 'การตรวจจับโลหะ', parameterId: 'PR0010' },
+    { id: 'MAP0018', processId: 'PC0013', processName: 'การบรรจุ/ซีล/ติดฉลาก', parameterId: 'PR0018' },
+    { id: 'MAP0019', processId: 'PC0013', processName: 'การบรรจุ/ซีล/ติดฉลาก', parameterId: 'PR0017' },
+    { id: 'MAP0020', processId: 'PC0013', processName: 'การบรรจุ/ซีล/ติดฉลาก', parameterId: 'PR0015' },
+    { id: 'MAP0021', processId: 'PC0015', processName: 'การจัดเก็บสินค้าแช่แข็ง', parameterId: 'PR0007' }
+  ],
+  /* === MACHINES === 7 records */
+  machines: [
+    { id: 'MC001', name: 'meat_cutter', processId: 'P003', type: 'processing_machine' },
+    { id: 'MC002', name: 'marinade_mixer', processId: 'P005', type: 'processing_machine' },
+    { id: 'MC003', name: 'skewer_machine', processId: 'P006', type: 'processing_machine' },
+    { id: 'MC004', name: 'grill_machine', processId: 'P007', type: 'cooking_machine' },
+    { id: 'MC005', name: 'metal_detector_unit', processId: 'P009', type: 'inspection_machine' },
+    { id: 'MC006', name: 'vacuum_packer', processId: 'P010', type: 'packing_machine' },
+    { id: 'MC007', name: 'blast_freezer', processId: 'P011', type: 'freezing_machine' }
+  ],
+  /* === TRANSACTIONAL TABLES === empty at start, filled by users */
+  rmInspections: [],
+  fgInspections: [],
+  pkgInspections: [],
+  inprocessInspections: [],   // FM-QA-32 — nested process/parameter/rounds
+  haccpRecords: [],
+  ncCapa: [],
+  environmental: [],
+  training: [],
+  traceability: [],
+  complaints: []
+};
+
+/* ---------------- STORAGE LAYER ---------------- */
+let DB = null;
+let currentUser = null;
+let currentPage = 'dashboard';
+
+function loadDB() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      DB = JSON.parse(stored);
+      // patch missing keys
+      Object.keys(SEED).forEach(k => { if (!(k in DB)) DB[k] = SEED[k]; });
+    } else {
+      DB = JSON.parse(JSON.stringify(SEED));
+      saveDB();
+    }
+  } catch (e) {
+    console.error('loadDB error', e);
+    DB = JSON.parse(JSON.stringify(SEED));
+  }
+}
+function saveDB() {
+  DB.meta.lastSync = new Date().toISOString();
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(DB));
+  // optional: push to remote
+  if (API_BASE_URL) {
+    setSyncStatus('syncing');
+    syncToServer()
+      .then(() => setSyncStatus('online'))
+      .catch(e => { console.warn('sync failed', e); setSyncStatus('offline'); });
+  }
+}
+async function syncToServer() {
+  // POST whole snapshot — Worker has /api/sync endpoint
+  const res = await fetch(`${API_BASE_URL}/api/sync`, {
+    method: 'POST', headers: {'Content-Type':'application/json'},
+    body: JSON.stringify(DB)
+  });
+  if (!res.ok) throw new Error('sync HTTP ' + res.status);
+  return res.json().catch(() => ({}));
+}
+function setSyncStatus(state) {
+  const dot = document.getElementById('syncDot');
+  const lbl = document.getElementById('syncLabel');
+  if (!dot || !lbl) return;
+  const map = {
+    online:   { color:'bg-emerald-500', text:'Cloudflare D1' },
+    syncing:  { color:'bg-amber-500 animate-pulse', text:'กำลังซิงค์...' },
+    offline:  { color:'bg-red-500', text:'ออฟไลน์ (localStorage)' },
+    local:    { color:'bg-slate-400', text:'Local Storage เท่านั้น' }
+  };
+  const s = map[state] || map.online;
+  dot.className = 'w-2 h-2 rounded-full ' + s.color;
+  lbl.textContent = s.text;
+}
+async function pingApi() {
+  if (!API_BASE_URL) { setSyncStatus('local'); return; }
+  try {
+    const r = await fetch(`${API_BASE_URL}/api/health`);
+    if (r.ok) setSyncStatus('online');
+    else setSyncStatus('offline');
+  } catch { setSyncStatus('offline'); }
+}
+
+/* ---------------- UTILITIES ---------------- */
+function nextId(prefix, key) {
+  const items = DB[key] || [];
+  let max = 0;
+  items.forEach(i => {
+    const m = (i.id || '').match(/(\d+)$/);
+    if (m) max = Math.max(max, parseInt(m[1]));
+  });
+  return prefix + String(max + 1).padStart(4, '0');
+}
+function fmtDate(d) {
+  if (!d) return '-';
+  const dt = new Date(d);
+  return dt.toLocaleDateString('th-TH', { year:'numeric', month:'short', day:'numeric' });
+}
+function fmtDateTime(d) {
+  if (!d) return '-';
+  return new Date(d).toLocaleString('th-TH', { dateStyle: 'short', timeStyle: 'short' });
+}
+function today() { return new Date().toISOString().split('T')[0]; }
+function nowISO() { return new Date().toISOString(); }
+function toast(msg, type='success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'fixed bottom-6 right-6 z-50 px-4 py-3 rounded-lg shadow-lg text-white font-medium fade-in ' +
+    (type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-red-600' : 'bg-blue-600');
+  el.classList.remove('hidden');
+  setTimeout(() => el.classList.add('hidden'), 2500);
+}
+function confirmAction(msg) { return window.confirm(msg); }
+
+/* ---------------- AUTH ---------------- */
+function doLogin() {
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  loadDB();
+  const user = DB.users.find(x => x.username === u && x.password === p);
+  if (!user) { toast('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'error'); return; }
+  currentUser = user;
+  sessionStorage.setItem('swi_qa_user', JSON.stringify(user));
+  showApp();
+}
+function doLogout() {
+  sessionStorage.removeItem('swi_qa_user');
+  currentUser = null;
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('loginScreen').classList.remove('hidden');
+}
+function showApp() {
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  document.getElementById('userName').textContent = currentUser.name;
+  document.getElementById('userRole').textContent = currentUser.role;
+  document.getElementById('userAvatar').textContent = currentUser.name.charAt(0);
+  // Honor deep-link hash on first load (PWA shortcuts target #rmInspection etc.)
+  const hash = (location.hash || '').replace('#','');
+  navigateTo(hash && hash !== 'dashboard' ? hash : 'dashboard');
+}
+
+/* ---------------- ROUTER ---------------- */
+const PAGES = {
+  dashboard: { title: 'Dashboard', subtitle: 'ภาพรวมสถานะคุณภาพและ KPI หลัก', render: renderDashboard },
+  suppliers: { title: 'ซัพพลายเออร์', subtitle: 'Master Data — ผู้จัดส่งวัตถุดิบและสารเคมี', render: () => renderTable('suppliers') },
+  materials: { title: 'วัตถุดิบ / Material', subtitle: 'Master Data — รหัสและข้อกำหนดวัตถุดิบ', render: () => renderTable('materials') },
+  finishedGoods: { title: 'สินค้าสำเร็จรูป', subtitle: 'Master Data — Finished Goods', render: () => renderTable('finishedGoods') },
+  processes: { title: 'กระบวนการผลิต', subtitle: 'Master Data — กระบวนการและจุด CCP', render: () => renderTable('processes') },
+  rmInspection: { title: 'ตรวจรับวัตถุดิบ (FM-QA-31)', subtitle: 'Raw Material Receiving Inspection', render: () => renderTable('rmInspections') },
+  inprocess: { title: 'ตรวจระหว่างผลิต (FM-QA-32)', subtitle: 'In-Process Inspection — Process / Parameter / จุดตรวจ', render: renderInprocess },
+  fgInspection: { title: 'ตรวจสินค้าสำเร็จรูป', subtitle: 'Finished Goods Inspection', render: () => renderTable('fgInspections') },
+  pkgInspection: { title: 'ตรวจบรรจุภัณฑ์', subtitle: 'Packaging Material Inspection', render: () => renderTable('pkgInspections') },
+  haccp: { title: 'HACCP / CCP Monitoring', subtitle: 'การติดตามจุดควบคุมวิกฤต', render: () => renderTable('haccpRecords') },
+  ncCapa: { title: 'NC / CAPA Management', subtitle: 'Non-Conformance & Corrective Action', render: () => renderTable('ncCapa') },
+  environment: { title: 'สิ่งแวดล้อม', subtitle: 'Environmental Monitoring', render: () => renderTable('environmental') },
+  training: { title: 'การฝึกอบรม', subtitle: 'Training Records', render: () => renderTable('training') },
+  traceability: { title: 'Traceability', subtitle: 'การสอบกลับสินค้า', render: () => renderTable('traceability') },
+  complaints: { title: 'ร้องเรียนลูกค้า', subtitle: 'Customer Complaints', render: () => renderTable('complaints') },
+  ingredients: { title: 'เครื่องปรุง / Ingredients', subtitle: 'Master Data — ส่วนผสมและเครื่องปรุง 38 รายการ', render: () => renderTable('ingredients') },
+  packaging: { title: 'บรรจุภัณฑ์', subtitle: 'Master Data — Packaging Materials 60 รายการ', render: () => renderTable('packaging') },
+  chemicals: { title: 'สารเคมี / น้ำยาทำความสะอาด', subtitle: 'Master Data — Cleaning & Sanitizing Chemicals', render: () => renderTable('chemicals') },
+  parameters: { title: 'พารามิเตอร์ควบคุม', subtitle: 'Master Data — Control Parameters & Spec Limits', render: () => renderTable('parameters') },
+  equipment: { title: 'เครื่องมือวัด', subtitle: 'Master Data — Measuring & Testing Equipment', render: () => renderTable('equipment') },
+  ccps: { title: 'CCP Master', subtitle: 'Master Data — Critical Control Points', render: () => renderTable('ccps') },
+  machines: { title: 'เครื่องจักร', subtitle: 'Master Data — Production Machines', render: () => renderTable('machines') },
+  processParamMap: { title: 'จับคู่ Process ↔ Parameter', subtitle: 'Master Data — Process-Parameter Mapping', render: () => renderTable('processParamMap') },
+  reports: { title: 'รายงาน & KPI', subtitle: 'รายงานคุณภาพประจำเดือนและ KPI ทั้งหมด', render: renderReports },
+  settings: { title: 'ตั้งค่าระบบ', subtitle: 'การตั้งค่าระบบและผู้ใช้', render: renderSettings }
+};
+function navigateTo(page) {
+  currentPage = page;
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.toggle('active', n.dataset.page === page));
+  const p = PAGES[page];
+  if (!p) return;
+  document.getElementById('pageTitle').textContent = p.title;
+  document.getElementById('pageSubtitle').textContent = p.subtitle;
+  const c = document.getElementById('pageContent');
+  c.innerHTML = '';
+  c.classList.add('fade-in');
+  p.render(c);
+  // PWA: update hash for deep-linking (matches manifest shortcuts)
+  if (location.hash !== '#' + page) {
+    try { history.replaceState(null, '', '#' + page); } catch {}
+  }
+  // PWA: close mobile drawer after nav
+  closeMobileNav();
+  // PWA: scroll main back to top
+  const main = document.querySelector('main');
+  if (main) main.scrollTop = 0;
+}
+document.addEventListener('click', e => {
+  const navi = e.target.closest('.nav-item');
+  if (navi && navi.dataset.page) navigateTo(navi.dataset.page);
+});
+// Handle browser back/forward + manifest shortcuts arriving with hash
+window.addEventListener('hashchange', () => {
+  const h = location.hash.replace('#','');
+  if (h && PAGES[h] && h !== currentPage) navigateTo(h);
+});
+
+/* ---------------- MOBILE NAV DRAWER ---------------- */
+function openMobileNav() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('drawerBackdrop').classList.add('open');
+}
+function closeMobileNav() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('drawerBackdrop').classList.remove('open');
+}
+
+/* ---------------- PWA: INSTALL PROMPT ---------------- */
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  // Show install button in header (desktop) + banner (mobile, if not previously dismissed)
+  const ib = document.getElementById('installBtn');
+  if (ib) ib.style.display = 'inline-flex';
+  if (!localStorage.getItem('swi_qa_install_dismissed')) {
+    const banner = document.getElementById('installBanner');
+    if (banner) banner.classList.add('show');
+  }
+});
+async function installPWA() {
+  if (!deferredInstallPrompt) {
+    // iOS Safari has no beforeinstallprompt — show manual instructions
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
+      alert('การติดตั้งบน iPhone/iPad:\n\n1. กดปุ่ม Share (กล่องลูกศรขึ้น) ในเบราว์เซอร์ Safari\n2. เลือก "Add to Home Screen" / "เพิ่มสู่หน้าจอหลัก"\n3. กด "Add" / "เพิ่ม"\n\nแอปจะเพิ่มลงหน้าจอหลักของคุณ ใช้งานเหมือนแอปจริง');
+    } else {
+      alert('อุปกรณ์นี้ยังไม่รองรับการติดตั้ง หรือติดตั้งไปแล้ว');
+    }
+    return;
+  }
+  deferredInstallPrompt.prompt();
+  const choice = await deferredInstallPrompt.userChoice;
+  if (choice.outcome === 'accepted') {
+    toast('ติดตั้งเป็นแอปสำเร็จ', 'success');
+    document.getElementById('installBanner').classList.remove('show');
+    document.getElementById('installBtn').style.display = 'none';
+  }
+  deferredInstallPrompt = null;
+}
+function dismissInstall() {
+  document.getElementById('installBanner').classList.remove('show');
+  localStorage.setItem('swi_qa_install_dismissed', '1');
+}
+// Already installed?
+window.addEventListener('appinstalled', () => {
+  document.getElementById('installBanner').classList.remove('show');
+  document.getElementById('installBtn').style.display = 'none';
+  toast('ติดตั้งแอปสำเร็จ', 'success');
+});
+
+/* ---------------- PWA: SERVICE WORKER ---------------- */
+let swReg = null;
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => {
+        swReg = reg;
+        // Check for updates every 5 min
+        setInterval(() => reg.update().catch(()=>{}), 5 * 60 * 1000);
+        reg.addEventListener('updatefound', () => {
+          const nw = reg.installing;
+          if (!nw) return;
+          nw.addEventListener('statechange', () => {
+            if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+              const b = document.getElementById('updateBanner');
+              if (b) b.classList.add('show');
+            }
+          });
+        });
+      })
+      .catch(err => console.warn('[SW] register failed:', err));
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshing) return; refreshing = true; window.location.reload();
+    });
+  });
+}
+function applyUpdate() {
+  if (swReg && swReg.waiting) {
+    swReg.waiting.postMessage({ type: 'SKIP_WAITING' });
+  } else {
+    window.location.reload();
+  }
+}
+
+/* ---------------- DASHBOARD ---------------- */
+function renderDashboard(container) {
+  // compute KPIs
+  const rmInsp = DB.rmInspections;
+  const totalRM = rmInsp.length || 1;
+  const passedRM = rmInsp.filter(r => r.result === 'PASS').length;
+  const receivingComp = ((passedRM / totalRM) * 100).toFixed(1);
+
+  const ccp = DB.haccpRecords;
+  const ccpPass = ccp.filter(r => r.status === 'IN_LIMIT').length;
+  const ccpRate = ccp.length ? ((ccpPass / ccp.length) * 100).toFixed(1) : 100;
+
+  const openNC = DB.ncCapa.filter(r => r.status !== 'Closed').length;
+  const closedNC = DB.ncCapa.filter(r => r.status === 'Closed').length;
+  const totalNC = openNC + closedNC;
+  const capaRate = totalNC ? ((closedNC / totalNC) * 100).toFixed(1) : 100;
+
+  const totalSup = DB.suppliers.length;
+  const approvedSup = DB.suppliers.filter(s => s.status === 'Approved').length;
+  // derive score from status: Approved=100, Conditional=70, Pending=50
+  const scoreMap = { 'Approved':100, 'Conditional':70, 'Pending':50, 'Rejected':0 };
+  const avgScore = DB.suppliers.length ? (DB.suppliers.reduce((a,s)=>a+(scoreMap[s.status]||0),0)/DB.suppliers.length).toFixed(1) : 0;
+
+  const complaints = DB.complaints;
+  const openComplaints = complaints.filter(c => c.status !== 'Closed').length;
+
+  container.innerHTML = `
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="kpi">
+        <div class="text-xs text-ink-mute uppercase tracking-wider font-semibold mb-2">Receiving Compliance</div>
+        <div class="flex items-baseline gap-2">
+          <span class="kpi-value text-3xl text-brand">${receivingComp}</span>
+          <span class="text-lg text-ink-mute">%</span>
+        </div>
+        <div class="text-xs text-ink-mute mt-1">เป้าหมาย ≥ 98% · ${rmInsp.length} ครั้ง</div>
+        <div class="mt-2 h-1 bg-stone-200 rounded overflow-hidden">
+          <div class="h-full bg-brand" style="width:${Math.min(receivingComp,100)}%"></div>
+        </div>
+      </div>
+      <div class="kpi">
+        <div class="text-xs text-ink-mute uppercase tracking-wider font-semibold mb-2">CCP Compliance</div>
+        <div class="flex items-baseline gap-2">
+          <span class="kpi-value text-3xl ${ccpRate>=100?'text-emerald-600':'text-amber-600'}">${ccpRate}</span>
+          <span class="text-lg text-ink-mute">%</span>
+        </div>
+        <div class="text-xs text-ink-mute mt-1">เป้าหมาย = 100% · ${ccp.length} จุด</div>
+        <div class="mt-2 h-1 bg-stone-200 rounded overflow-hidden">
+          <div class="h-full ${ccpRate>=100?'bg-emerald-500':'bg-amber-500'}" style="width:${ccpRate}%"></div>
+        </div>
+      </div>
+      <div class="kpi">
+        <div class="text-xs text-ink-mute uppercase tracking-wider font-semibold mb-2">Open NC / CAPA</div>
+        <div class="flex items-baseline gap-2">
+          <span class="kpi-value text-3xl ${openNC>5?'text-red-600':'text-ink'}">${openNC}</span>
+          <span class="text-sm text-ink-mute">รายการ</span>
+        </div>
+        <div class="text-xs text-ink-mute mt-1">CAPA Closed Rate ${capaRate}%</div>
+      </div>
+      <div class="kpi">
+        <div class="text-xs text-ink-mute uppercase tracking-wider font-semibold mb-2">Supplier Score (avg)</div>
+        <div class="flex items-baseline gap-2">
+          <span class="kpi-value text-3xl text-brand">${avgScore}</span>
+          <span class="text-lg text-ink-mute">/100</span>
+        </div>
+        <div class="text-xs text-ink-mute mt-1">${approvedSup}/${totalSup} Approved</div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+      <div class="card p-5 lg:col-span-2">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-bold">แนวโน้ม NC / CAPA (30 วัน)</h3>
+          <span class="text-xs text-ink-mute">ปรับอัตโนมัติจากข้อมูลจริง</span>
+        </div>
+        <div style="height:240px"><canvas id="chartNC"></canvas></div>
+      </div>
+      <div class="card p-5">
+        <h3 class="font-bold mb-3">สัดส่วนซัพพลายเออร์ตามความเสี่ยง</h3>
+        <div style="height:240px"><canvas id="chartRisk"></canvas></div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+      <div class="card p-5">
+        <h3 class="font-bold mb-3">รายการเร่งด่วน</h3>
+        <div class="space-y-2" id="urgentList"></div>
+      </div>
+      <div class="card p-5">
+        <h3 class="font-bold mb-3">กิจกรรมล่าสุด</h3>
+        <div class="space-y-2 text-sm" id="activityList"></div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      ${[
+        ['suppliers','🏢','ซัพพลายเออร์',DB.suppliers.length],
+        ['materials','📦','วัตถุดิบ',DB.materials.length],
+        ['finishedGoods','🍗','FG',DB.finishedGoods.length],
+        ['processes','⚙️','กระบวนการ',DB.processes.length],
+        ['rmInspection','✓','ตรวจรับ',DB.rmInspections.length],
+        ['haccp','🌡️','HACCP',DB.haccpRecords.length],
+        ['ncCapa','⚠️','NC/CAPA',DB.ncCapa.length],
+        ['environment','🌱','สิ่งแวดล้อม',DB.environmental.length],
+        ['training','👥','ฝึกอบรม',DB.training.length],
+        ['traceability','🔍','Trace',DB.traceability.length],
+        ['complaints','📋','ร้องเรียน',DB.complaints.length],
+        ['reports','📊','รายงาน','→']
+      ].map(([p,i,t,n]) => `
+        <button onclick="navigateTo('${p}')" class="card p-3 text-center hover:border-brand transition">
+          <div class="text-2xl mb-1">${i}</div>
+          <div class="text-xs font-semibold">${t}</div>
+          <div class="text-sm font-mono text-brand">${n}</div>
+        </button>
+      `).join('')}
+    </div>
+  `;
+
+  // chart NC trend (last 30 days)
+  const days = [];
+  for (let i=29;i>=0;i--) {
+    const d = new Date(); d.setDate(d.getDate()-i);
+    days.push(d.toISOString().split('T')[0]);
+  }
+  const ncCounts = days.map(d => DB.ncCapa.filter(r => (r.date||'').startsWith(d)).length);
+  new Chart(document.getElementById('chartNC'), {
+    type: 'line',
+    data: { labels: days.map(d=>d.slice(5)), datasets: [{
+      label: 'NC ใหม่', data: ncCounts,
+      borderColor: '#0D6E64', backgroundColor: 'rgba(13,110,100,.1)',
+      borderWidth: 2, tension: .35, fill: true, pointRadius: 0
+    }] },
+    options: { responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+  });
+
+  // chart risk pie
+  const byRisk = { HIGH: 0, MEDIUM: 0, LOW: 0 };
+  DB.suppliers.forEach(s => { byRisk[s.risk] = (byRisk[s.risk]||0) + 1; });
+  new Chart(document.getElementById('chartRisk'), {
+    type: 'doughnut',
+    data: { labels: ['HIGH','MEDIUM','LOW'],
+      datasets: [{ data: [byRisk.HIGH, byRisk.MEDIUM, byRisk.LOW],
+        backgroundColor: ['#DC2626','#F59E0B','#10B981'], borderWidth: 0 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+  });
+
+  // urgent list
+  const urgent = [];
+  DB.ncCapa.filter(r => r.status !== 'Closed').forEach(r => {
+    urgent.push({ icon:'⚠️', title:`NC ${r.id}: ${r.description||'-'}`, sub:`Due ${fmtDate(r.dueDate)}`, page:'ncCapa' });
+  });
+  DB.haccpRecords.filter(r => r.status === 'OUT_OF_LIMIT').forEach(r => {
+    urgent.push({ icon:'🚨', title:`CCP เกินขีดจำกัด: ${r.ccpName}`, sub:`บันทึก ${fmtDateTime(r.timestamp)}`, page:'haccp' });
+  });
+  DB.complaints.filter(c => c.status !== 'Closed').forEach(c => {
+    urgent.push({ icon:'📞', title:`ร้องเรียน ${c.id}: ${c.subject}`, sub:`ลูกค้า ${c.customer}`, page:'complaints' });
+  });
+  document.getElementById('urgentList').innerHTML = urgent.length ?
+    urgent.slice(0,6).map(u => `<div onclick="navigateTo('${u.page}')" class="flex items-start gap-3 p-2 rounded hover:bg-paper-warm cursor-pointer">
+      <div>${u.icon}</div>
+      <div class="flex-1 min-w-0"><div class="text-sm font-medium truncate">${u.title}</div><div class="text-xs text-ink-mute">${u.sub}</div></div>
+    </div>`).join('') : '<div class="text-sm text-ink-mute py-6 text-center">ไม่มีรายการเร่งด่วน — ทุกอย่างปกติ ✓</div>';
+
+  // activity feed (latest 8 across modules)
+  const activity = [];
+  const keys = ['rmInspections','haccpRecords','ncCapa','complaints','training','environmental','fgInspections','pkgInspections','traceability'];
+  keys.forEach(k => DB[k].forEach(r => activity.push({ key:k, ts: r.date || r.timestamp || r.created || nowISO(), id: r.id, label: r.description || r.subject || r.title || r.id })));
+  activity.sort((a,b) => (b.ts||'').localeCompare(a.ts||''));
+  document.getElementById('activityList').innerHTML = activity.length ?
+    activity.slice(0,8).map(a => `<div class="flex items-center justify-between border-b border-stone-100 pb-1">
+      <div><span class="font-mono text-xs text-ink-mute">${a.id||'-'}</span> <span>${a.label}</span></div>
+      <div class="text-xs text-ink-mute">${fmtDateTime(a.ts)}</div>
+    </div>`).join('') :
+    '<div class="text-sm text-ink-mute py-6 text-center">ยังไม่มีกิจกรรม — เริ่มบันทึกจากเมนูด้านซ้าย</div>';
+}
+
+/* ---------------- SCHEMA DEFINITIONS ---------------- */
+/* Each entity defines: fields[] for table cols + form fields, prefix for ID,
+   and optional formula computers. */
+const SCHEMA = {
+  suppliers: {
+    prefix: 'SP', label: 'ซัพพลายเออร์',
+    cols: ['id','name','type','risk','status','coa','halal','gmp','lastAuditDate'],
+    fields: [
+      { k:'name', label:'ชื่อบริษัท', type:'text', required:true },
+      { k:'type', label:'ประเภท', type:'select', options:[['RM','Raw Material'],['DM','Direct Material'],['PM','Packaging'],['CM','Cleaning/Chemical']], required:true },
+      { k:'risk', label:'ระดับความเสี่ยง', type:'select', options:[['LOW','LOW'],['MEDIUM','MEDIUM'],['HIGH','HIGH']], required:true },
+      { k:'status', label:'สถานะการอนุมัติ', type:'select', options:[['Approved','Approved'],['Conditional','Conditional'],['Pending','Pending'],['Rejected','Rejected']], required:true },
+      { k:'coa', label:'CoA Required', type:'select', options:[['Yes','Yes'],['No','No']] },
+      { k:'halal', label:'Halal Cert', type:'select', options:[['Yes','Yes'],['No','No']] },
+      { k:'gmp', label:'GMP Status', type:'select', options:[['Certified','Certified'],['Pending','Pending'],['-','-']] },
+      { k:'materialCode', label:'รหัสวัตถุดิบที่ส่ง', type:'text', placeholder:'RM0001, RM0002' },
+      { k:'lastAuditDate', label:'วันที่ตรวจประเมินล่าสุด', type:'date' },
+      { k:'contact', label:'เบอร์ติดต่อ', type:'text' },
+      { k:'email', label:'อีเมล', type:'email' },
+      { k:'address', label:'ที่อยู่', type:'textarea' },
+      { k:'notes', label:'หมายเหตุ', type:'textarea' }
+    ]
+  },
+  materials: {
+    prefix: 'MT', label: 'วัตถุดิบ',
+    cols: ['id','name','category','subCategory','unit','supplier','minTemp','maxTemp','risk','status'],
+    fields: [
+      { k:'name', label:'ชื่อวัตถุดิบ', type:'text', required:true },
+      { k:'category', label:'ประเภท', type:'select', options:[['RM','Raw Material'],['DM','Direct Material'],['PM','Packaging'],['CM','Chemical']], required:true },
+      { k:'subCategory', label:'หมวดย่อย', type:'text', placeholder:'Pork, Chicken, Rice, Seasoning, ...' },
+      { k:'unit', label:'หน่วยนับ', type:'text', placeholder:'กิโลกรัม, ลิตร, ใบ', required:true },
+      { k:'supplier', label:'ซัพพลายเออร์', type:'ref', refKey:'suppliers', refLabel:'name' },
+      { k:'minTemp', label:'อุณหภูมิต่ำสุด (°C)', type:'number', step:'0.1' },
+      { k:'maxTemp', label:'อุณหภูมิสูงสุด (°C)', type:'number', step:'0.1' },
+      { k:'shelfLife', label:'อายุการเก็บ (วัน)', type:'number' },
+      { k:'risk', label:'ระดับความเสี่ยง', type:'select', options:[['Low','Low'],['Medium','Medium'],['High','High']] },
+      { k:'status', label:'สถานะ', type:'select', options:[['Active','Active'],['Inactive','Inactive']] }
+    ]
+  },
+  finishedGoods: {
+    prefix: 'FG', label: 'สินค้าสำเร็จรูป',
+    cols: ['id','name','type','storageTemp','shelfLife','minWeight','maxWeight','status'],
+    fields: [
+      { k:'name', label:'ชื่อสินค้า', type:'text', required:true },
+      { k:'type', label:'ประเภทสินค้า', type:'select', options:[['Pork Marinated','หมูหมัก'],['Chicken Marinated','ไก่หมัก'],['Meat Ball','ลูกชิ้น'],['Esan Sausage','ไส้กรอกอีสาน'],['Rice','ข้าว']] },
+      { k:'storageTemp', label:'อุณหภูมิเก็บ (°C)', type:'text', placeholder:'-18 / Ambient' },
+      { k:'shelfLife', label:'อายุการเก็บ (วัน)', type:'number' },
+      { k:'minWeight', label:'น้ำหนักต่อชิ้น ต่ำสุด (g)', type:'number', step:'0.1' },
+      { k:'maxWeight', label:'น้ำหนักต่อชิ้น สูงสุด (g)', type:'number', step:'0.1' },
+      { k:'minPack', label:'น้ำหนัก/แพ็ค ต่ำสุด (g)', type:'number', step:'0.1' },
+      { k:'maxPack', label:'น้ำหนัก/แพ็ค สูงสุด (g)', type:'number', step:'0.1' },
+      { k:'status', label:'สถานะ', type:'select', options:[['Active','Active'],['Inactive','Inactive']] }
+    ]
+  },
+  processes: {
+    prefix: 'PC', label: 'กระบวนการ',
+    cols: ['id','step','name','area','isCCP'],
+    fields: [
+      { k:'name', label:'ชื่อกระบวนการ', type:'text', required:true },
+      { k:'step', label:'ลำดับ', type:'number', required:true },
+      { k:'description', label:'รายละเอียด', type:'textarea' },
+      { k:'area', label:'พื้นที่ปฏิบัติงาน', type:'text' },
+      { k:'isCCP', label:'เป็นจุด CCP?', type:'checkbox' },
+      { k:'criticalLimit', label:'Critical Limit', type:'text' },
+      { k:'monitoring', label:'วิธีการตรวจติดตาม', type:'textarea' }
+    ]
+  },
+  rmInspections: {
+    prefix: 'RMI', label: 'ตรวจรับวัตถุดิบ',
+    cols: ['id','date','supplier','material','quantity','temp','result','inspector'],
+    fields: [
+      { k:'date', label:'วันที่ตรวจ', type:'date', required:true, default: today },
+      { k:'supplier', label:'ซัพพลายเออร์', type:'ref', refKey:'suppliers', refLabel:'name', required:true, scan:true },
+      { k:'material', label:'วัตถุดิบ', type:'ref', refKey:'materials', refLabel:'name', required:true, scan:true },
+      { k:'lotNo', label:'Lot No.', type:'text', required:true, scan:true },
+      { k:'quantity', label:'จำนวน', type:'number', required:true },
+      { k:'unit', label:'หน่วย', type:'text', default:()=>'kg' },
+      { k:'temp', label:'อุณหภูมิ (°C)', type:'number', step:'0.1' },
+      { k:'visual', label:'ตรวจสภาพภายนอก (สี/กลิ่น/ลักษณะ)', type:'textarea' },
+      { k:'coaReceived', label:'ได้รับ CoA แล้ว', type:'checkbox' },
+      { k:'samplingPlan', label:'แผนสุ่มตัวอย่าง', type:'text', placeholder:'AQL 2.5' },
+      { k:'result', label:'ผลการตรวจ', type:'select', options:[['PASS','PASS'],['FAIL','FAIL'],['Conditional','รับเงื่อนไข']], required:true },
+      { k:'remarks', label:'หมายเหตุ', type:'textarea' },
+      { k:'inspector', label:'ผู้ตรวจ', type:'text', default:()=>currentUser?.name||'' }
+    ],
+    onFail: (rec) => {
+      // auto-generate NC
+      if (rec.result === 'FAIL') {
+        const ncId = nextId('NC','ncCapa');
+        DB.ncCapa.push({
+          id: ncId, date: rec.date, type: 'Raw Material',
+          description: `วัตถุดิบไม่ผ่านการตรวจรับ — ${rec.material} (Lot ${rec.lotNo})`,
+          source: rec.id, status: 'Open', severity: 'Medium',
+          rootCause: '', correctiveAction: '', preventiveAction: '',
+          dueDate: '', owner: '', created: nowISO()
+        });
+        toast(`สร้าง NC ${ncId} อัตโนมัติแล้ว`, 'info');
+      }
+    }
+  },
+  fgInspections: {
+    prefix: 'FGI', label: 'ตรวจ FG',
+    cols: ['id','date','product','batch','weightCheck','metalDetector','result','inspector'],
+    fields: [
+      { k:'date', label:'วันที่ตรวจ', type:'date', required:true, default: today },
+      { k:'product', label:'สินค้า', type:'ref', refKey:'finishedGoods', refLabel:'name', required:true, scan:true },
+      { k:'batch', label:'Batch No.', type:'text', required:true, scan:true },
+      { k:'quantity', label:'จำนวนที่ผลิต', type:'number' },
+      { k:'weightTarget', label:'น้ำหนักเป้าหมาย (g)', type:'number' },
+      { k:'weightActual', label:'น้ำหนักจริงเฉลี่ย (g)', type:'number' },
+      { k:'weightCheck', label:'ผลตรวจน้ำหนัก', type:'select', options:[['PASS','PASS'],['FAIL','FAIL']] },
+      { k:'visual', label:'ตรวจสภาพภายนอก', type:'textarea' },
+      { k:'metalDetector', label:'ผ่าน Metal Detector', type:'select', options:[['PASS','PASS'],['FAIL','FAIL']] },
+      { k:'coreTemp', label:'อุณหภูมิแกน (°C)', type:'number', step:'0.1' },
+      { k:'sensoryColor', label:'สี', type:'text' },
+      { k:'sensoryTaste', label:'รส', type:'text' },
+      { k:'sensoryTexture', label:'เนื้อสัมผัส', type:'text' },
+      { k:'result', label:'ผลการตรวจ', type:'select', options:[['PASS','PASS'],['FAIL','FAIL']], required:true },
+      { k:'remarks', label:'หมายเหตุ', type:'textarea' },
+      { k:'inspector', label:'ผู้ตรวจ', type:'text', default:()=>currentUser?.name||'' }
+    ],
+    onFail: (rec) => {
+      if (rec.result === 'FAIL') {
+        const ncId = nextId('NC','ncCapa');
+        DB.ncCapa.push({
+          id: ncId, date: rec.date, type: 'Finished Goods',
+          description: `FG ไม่ผ่านการตรวจ — ${rec.product} (Batch ${rec.batch})`,
+          source: rec.id, status: 'Open', severity: 'High',
+          rootCause: '', correctiveAction: '', preventiveAction: '',
+          dueDate: '', owner: '', created: nowISO()
+        });
+        toast(`สร้าง NC ${ncId} อัตโนมัติแล้ว`, 'info');
+      }
+    }
+  },
+  pkgInspections: {
+    prefix: 'PKI', label: 'ตรวจบรรจุภัณฑ์',
+    cols: ['id','date','material','quantity','visual','result','inspector'],
+    fields: [
+      { k:'date', label:'วันที่ตรวจ', type:'date', required:true, default: today },
+      { k:'material', label:'บรรจุภัณฑ์', type:'ref', refKey:'packaging', refLabel:'name', required:true, scan:true },
+      { k:'lotNo', label:'Lot No.', type:'text', scan:true },
+      { k:'quantity', label:'จำนวน', type:'number' },
+      { k:'visual', label:'สภาพภายนอก', type:'textarea' },
+      { k:'dimension', label:'ขนาดถูกต้อง', type:'select', options:[['PASS','PASS'],['FAIL','FAIL']] },
+      { k:'foodGrade', label:'มีใบรับรอง Food Grade', type:'checkbox' },
+      { k:'result', label:'ผลการตรวจ', type:'select', options:[['PASS','PASS'],['FAIL','FAIL']], required:true },
+      { k:'remarks', label:'หมายเหตุ', type:'textarea' },
+      { k:'inspector', label:'ผู้ตรวจ', type:'text', default:()=>currentUser?.name||'' }
+    ]
+  },
+  haccpRecords: {
+    prefix: 'CCP', label: 'HACCP / CCP',
+    cols: ['id','timestamp','ccpName','measuredValue','criticalLimit','status','operator'],
+    fields: [
+      { k:'timestamp', label:'วันที่/เวลา', type:'datetime-local', required:true, default:()=>new Date().toISOString().slice(0,16) },
+      { k:'ccpName', label:'จุด CCP', type:'select', dynamicOptions: () => DB.processes.filter(p => p.isCCP).map(p => [p.name, `${p.id} — ${p.name}`]), required:true },
+      { k:'criticalLimit', label:'Critical Limit', type:'text', required:true, placeholder:'เช่น Core ≥ 75°C' },
+      { k:'measuredValue', label:'ค่าที่วัดได้', type:'text', required:true },
+      { k:'status', label:'สถานะ', type:'select', options:[['IN_LIMIT','ผ่านขีดจำกัด'],['OUT_OF_LIMIT','เกินขีดจำกัด']], required:true },
+      { k:'correctiveAction', label:'การแก้ไขทันที (ถ้าเกิน CL)', type:'textarea' },
+      { k:'productDisposition', label:'การจัดการสินค้าผลิต', type:'select', options:[['Continue','ผลิตต่อ'],['Hold','กักไว้'],['Rework','Rework'],['Scrap','ทำลาย']] },
+      { k:'operator', label:'ผู้ตรวจติดตาม', type:'text', default:()=>currentUser?.name||'' },
+      { k:'verifier', label:'ผู้ทวนสอบ', type:'text' }
+    ],
+    onFail: (rec) => {
+      if (rec.status === 'OUT_OF_LIMIT') {
+        const ncId = nextId('NC','ncCapa');
+        DB.ncCapa.push({
+          id: ncId, date: rec.timestamp, type: 'CCP Deviation',
+          description: `CCP เกินขีดจำกัด — ${rec.ccpName} (วัดได้ ${rec.measuredValue}, CL ${rec.criticalLimit})`,
+          source: rec.id, status: 'Open', severity: 'Critical',
+          rootCause: '', correctiveAction: rec.correctiveAction || '',
+          preventiveAction: '', dueDate: '', owner: '', created: nowISO()
+        });
+        toast(`CCP เกินขีดจำกัด — สร้าง NC ${ncId}`, 'error');
+      }
+    }
+  },
+  ncCapa: {
+    prefix: 'NC', label: 'NC / CAPA',
+    cols: ['id','date','type','description','severity','status','dueDate','owner'],
+    fields: [
+      { k:'date', label:'วันที่บันทึก NC', type:'date', required:true, default: today },
+      { k:'type', label:'ประเภท', type:'select', options:[['Raw Material','Raw Material'],['Finished Goods','Finished Goods'],['Packaging','Packaging'],['CCP Deviation','CCP Deviation'],['Process','Process'],['Customer','Customer'],['Audit','Audit']], required:true },
+      { k:'description', label:'รายละเอียดปัญหา', type:'textarea', required:true },
+      { k:'severity', label:'ความรุนแรง', type:'select', options:[['Low','Low'],['Medium','Medium'],['High','High'],['Critical','Critical']], required:true },
+      { k:'source', label:'แหล่งที่มา (ID อ้างอิง)', type:'text' },
+      { k:'rootCause', label:'Root Cause Analysis', type:'textarea' },
+      { k:'correctiveAction', label:'Corrective Action', type:'textarea' },
+      { k:'preventiveAction', label:'Preventive Action', type:'textarea' },
+      { k:'owner', label:'ผู้รับผิดชอบ', type:'text' },
+      { k:'dueDate', label:'กำหนดเสร็จ', type:'date' },
+      { k:'verifiedBy', label:'ผู้ทวนสอบ', type:'text' },
+      { k:'effectivenessCheck', label:'ผลการทวนสอบประสิทธิผล', type:'textarea' },
+      { k:'status', label:'สถานะ', type:'select', options:[['Open','Open'],['In Progress','In Progress'],['Pending Verification','Pending Verification'],['Closed','Closed']], required:true, default:()=>'Open' }
+    ]
+  },
+  environmental: {
+    prefix: 'ENV', label: 'สิ่งแวดล้อม',
+    cols: ['id','date','area','parameter','value','limit','result','operator'],
+    fields: [
+      { k:'date', label:'วันที่ตรวจ', type:'datetime-local', required:true, default:()=>new Date().toISOString().slice(0,16) },
+      { k:'area', label:'พื้นที่/ห้อง', type:'select', options:[['Cold Storage','ห้องเย็น'],['Production','ห้องผลิต'],['Packaging','ห้องบรรจุ'],['Cooking','ห้องปรุง'],['Warehouse','คลังสินค้า']], required:true },
+      { k:'parameter', label:'พารามิเตอร์', type:'select', options:[['Temperature','อุณหภูมิ (°C)'],['Humidity','ความชื้น (%)'],['ATP Swab','ATP Swab (RLU)'],['Microorganism','จุลินทรีย์ (cfu/cm²)'],['Pressure','ความดัน (Pa)']], required:true },
+      { k:'value', label:'ค่าที่วัดได้', type:'number', step:'0.01', required:true },
+      { k:'limit', label:'ขีดจำกัด', type:'text', placeholder:'≤ 4 / ≤ 65 / ≤ 100' },
+      { k:'result', label:'ผล', type:'select', options:[['PASS','PASS'],['FAIL','FAIL']], required:true },
+      { k:'action', label:'การดำเนินการ (ถ้า FAIL)', type:'textarea' },
+      { k:'operator', label:'ผู้ตรวจ', type:'text', default:()=>currentUser?.name||'' }
+    ]
+  },
+  training: {
+    prefix: 'TR', label: 'การฝึกอบรม',
+    cols: ['id','date','title','trainer','attendees','assessment','status'],
+    fields: [
+      { k:'date', label:'วันที่อบรม', type:'date', required:true, default: today },
+      { k:'title', label:'หัวข้อ', type:'text', required:true },
+      { k:'category', label:'หมวด', type:'select', options:[['GHP','GHP'],['HACCP','HACCP'],['Hygiene','Hygiene'],['Safety','Safety'],['Technical','Technical'],['Soft Skill','Soft Skill']] },
+      { k:'trainer', label:'วิทยากร', type:'text', required:true },
+      { k:'attendees', label:'จำนวนผู้เข้าอบรม', type:'number' },
+      { k:'duration', label:'ระยะเวลา (ชั่วโมง)', type:'number' },
+      { k:'assessment', label:'วิธีประเมิน', type:'select', options:[['Test','Test'],['Observation','Observation'],['Demonstration','Demonstration'],['None','None']] },
+      { k:'avgScore', label:'คะแนนเฉลี่ย', type:'number' },
+      { k:'effectiveness', label:'การประเมินประสิทธิผล', type:'textarea' },
+      { k:'status', label:'สถานะ', type:'select', options:[['Planned','Planned'],['Completed','Completed'],['Cancelled','Cancelled']], required:true, default:()=>'Completed' }
+    ]
+  },
+  traceability: {
+    prefix: 'TR', label: 'Traceability',
+    cols: ['id','date','batch','product','rmLots','customer','quantity','direction'],
+    fields: [
+      { k:'date', label:'วันที่บันทึก', type:'date', required:true, default: today },
+      { k:'direction', label:'ทิศทางการสอบกลับ', type:'select', options:[['Forward','Forward (RM → ลูกค้า)'],['Backward','Backward (ลูกค้า → RM)']], required:true },
+      { k:'product', label:'สินค้า', type:'ref', refKey:'finishedGoods', refLabel:'name', required:true },
+      { k:'batch', label:'Batch No.', type:'text', required:true },
+      { k:'productionDate', label:'วันที่ผลิต', type:'date' },
+      { k:'rmLots', label:'Lot วัตถุดิบที่ใช้ (เช่น Lot001, Lot002)', type:'textarea' },
+      { k:'quantity', label:'ปริมาณการผลิต', type:'number' },
+      { k:'customer', label:'ลูกค้า/ปลายทาง', type:'text', placeholder:'MK / Lotus\'s / 7-Eleven / BigC' },
+      { k:'shipDate', label:'วันที่จัดส่ง', type:'date' },
+      { k:'reason', label:'เหตุผลในการสอบกลับ', type:'textarea' },
+      { k:'completionTime', label:'เวลาที่ใช้สอบกลับ (นาที)', type:'number' }
+    ]
+  },
+  ingredients: {
+    prefix: 'PD', label: 'เครื่องปรุง / Ingredients',
+    cols: ['id','name','category','unit','storageTemp','risk'],
+    fields: [
+      { k:'name', label:'ชื่อเครื่องปรุง', type:'text', required:true },
+      { k:'category', label:'หมวด', type:'select', options:[['Seasoning','Seasoning'],['Ingredient','Ingredient'],['Additive','Additive']] },
+      { k:'unit', label:'หน่วย', type:'text', placeholder:'กิโลกรัม / กรัม / ลิตร' },
+      { k:'storageTemp', label:'อุณหภูมิเก็บ', type:'text', placeholder:'25-30 C' },
+      { k:'risk', label:'ความเสี่ยง', type:'select', options:[['Low','Low'],['Medium','Medium'],['High','High']] }
+    ]
+  },
+  packaging: {
+    prefix: 'PK', label: 'บรรจุภัณฑ์',
+    cols: ['id','name','unit','risk'],
+    fields: [
+      { k:'name', label:'ชื่อบรรจุภัณฑ์', type:'text', required:true },
+      { k:'unit', label:'หน่วย', type:'text', placeholder:'ใบ / กิโลกรัม / ม้วน / ดวง' },
+      { k:'risk', label:'ความเสี่ยง', type:'select', options:[['Low','Low'],['Medium','Medium'],['High','High']] }
+    ]
+  },
+  chemicals: {
+    prefix: 'CM', label: 'สารเคมี / น้ำยาทำความสะอาด',
+    cols: ['id','name','unit','risk'],
+    fields: [
+      { k:'name', label:'ชื่อสารเคมี', type:'text', required:true },
+      { k:'unit', label:'หน่วย', type:'text', placeholder:'กิโลกรัม / ลิตร / แกลลอน' },
+      { k:'risk', label:'ความเสี่ยง', type:'select', options:[['Low','Low'],['Medium','Medium'],['High','High']] }
+    ]
+  },
+  parameters: {
+    prefix: 'PR', label: 'พารามิเตอร์ควบคุม',
+    cols: ['id','name','category','spec','unit'],
+    fields: [
+      { k:'name', label:'พารามิเตอร์', type:'text', required:true },
+      { k:'description', label:'รายละเอียด', type:'textarea' },
+      { k:'category', label:'หมวดหมู่', type:'select', options:[['Temperature','Temperature'],['Quality','Quality'],['Food Safety','Food Safety'],['Weight','Weight'],['Visual','Visual'],['Process','Process']] },
+      { k:'spec', label:'Spec (ขีดจำกัด)', type:'text', required:true },
+      { k:'unit', label:'หน่วย', type:'text', placeholder:'°C / ppm / mm / g' }
+    ]
+  },
+  equipment: {
+    prefix: 'EQ', label: 'เครื่องมือวัด',
+    cols: ['id','name','type','usage'],
+    fields: [
+      { k:'name', label:'ชื่อเครื่องมือ', type:'text', required:true },
+      { k:'type', label:'ประเภท', type:'select', options:[['Measuring','Measuring'],['Testing','Testing'],['Visual','Visual']] },
+      { k:'usage', label:'การนำไปใช้งาน', type:'textarea' },
+      { k:'calibrationDue', label:'กำหนดสอบเทียบครั้งถัดไป', type:'date' },
+      { k:'status', label:'สถานะ', type:'select', options:[['Active','Active'],['Maintenance','Maintenance'],['Calibration Due','Calibration Due'],['Inactive','Inactive']] }
+    ]
+  },
+  ccps: {
+    prefix: 'CCP', label: 'CCP Master',
+    cols: ['id','processId','name','criticalLimit'],
+    fields: [
+      { k:'processId', label:'กระบวนการ', type:'ref', refKey:'processes', refLabel:'name', required:true },
+      { k:'name', label:'ชื่อ CCP', type:'text', required:true },
+      { k:'criticalLimit', label:'Critical Limit', type:'text', required:true, placeholder:'ø 1.0 mm. / ≥ 75 °C' },
+      { k:'monitoring', label:'การตรวจติดตาม', type:'textarea' },
+      { k:'correction', label:'การแก้ไขเมื่อเกินขีดจำกัด', type:'textarea' }
+    ]
+  },
+  machines: {
+    prefix: 'MC', label: 'เครื่องจักร',
+    cols: ['id','name','type','processId'],
+    fields: [
+      { k:'name', label:'ชื่อเครื่อง', type:'text', required:true },
+      { k:'type', label:'ประเภท', type:'select', options:[['processing_machine','Processing Machine'],['cooking_machine','Cooking Machine'],['inspection_machine','Inspection Machine'],['packing_machine','Packing Machine'],['freezing_machine','Freezing Machine']] },
+      { k:'processId', label:'ใช้ในกระบวนการ', type:'ref', refKey:'processes', refLabel:'name' },
+      { k:'maintenanceDate', label:'วันที่บำรุงรักษาล่าสุด', type:'date' },
+      { k:'status', label:'สถานะ', type:'select', options:[['Active','Active'],['Maintenance','Maintenance'],['Out of Service','Out of Service']] }
+    ]
+  },
+  processParamMap: {
+    prefix: 'MAP', label: 'จับคู่กระบวนการ-พารามิเตอร์',
+    cols: ['id','processId','processName','parameterId'],
+    fields: [
+      { k:'processId', label:'รหัสกระบวนการ', type:'ref', refKey:'processes', refLabel:'name', required:true },
+      { k:'processName', label:'ชื่อกระบวนการ', type:'text' },
+      { k:'parameterId', label:'พารามิเตอร์', type:'ref', refKey:'parameters', refLabel:'name', required:true }
+    ]
+  },
+  complaints: {
+    prefix: 'CC', label: 'ร้องเรียนลูกค้า',
+    cols: ['id','date','customer','product','subject','severity','status'],
+    fields: [
+      { k:'date', label:'วันที่รับเรื่อง', type:'date', required:true, default: today },
+      { k:'customer', label:'ชื่อลูกค้า', type:'text', required:true },
+      { k:'channel', label:'ช่องทาง', type:'select', options:[['Phone','โทรศัพท์'],['Email','Email'],['LINE','LINE'],['Walk-in','Walk-in'],['Social','Social Media']] },
+      { k:'product', label:'สินค้าที่เกี่ยวข้อง', type:'ref', refKey:'finishedGoods', refLabel:'name' },
+      { k:'batch', label:'Batch No.', type:'text' },
+      { k:'subject', label:'เรื่อง', type:'text', required:true },
+      { k:'description', label:'รายละเอียด', type:'textarea', required:true },
+      { k:'severity', label:'ความรุนแรง', type:'select', options:[['Low','Low'],['Medium','Medium'],['High','High'],['Critical','Critical']], required:true },
+      { k:'investigation', label:'การสอบสวน', type:'textarea' },
+      { k:'response', label:'การตอบกลับลูกค้า', type:'textarea' },
+      { k:'compensation', label:'การชดเชย', type:'text' },
+      { k:'status', label:'สถานะ', type:'select', options:[['Open','Open'],['In Progress','In Progress'],['Resolved','Resolved'],['Closed','Closed']], required:true, default:()=>'Open' },
+      { k:'assignee', label:'ผู้รับผิดชอบ', type:'text' }
+    ]
+  }
+};
+
+/* ---------------- GENERIC TABLE RENDERER ---------------- */
+function renderTable(key) {
+  const container = document.getElementById('pageContent');
+  const schema = SCHEMA[key];
+  if (!schema) return;
+  const items = DB[key] || [];
+
+  // controls
+  container.innerHTML = `
+    <div class="flex flex-wrap gap-2 mb-4 items-center justify-between">
+      <div class="flex gap-2 items-center flex-wrap">
+        <input id="searchInput" class="input" placeholder="ค้นหา..." style="width:240px">
+        ${schema.fields.some(f => f.k === 'status' || f.k === 'result') ? `
+          <select id="filterStatus" class="select" style="width:160px">
+            <option value="">ทั้งหมด</option>
+          </select>
+        ` : ''}
+        <span class="text-sm text-ink-mute">รวม <b id="recordCount">${items.length}</b> รายการ</span>
+      </div>
+      <div class="flex gap-2">
+        <button onclick="exportCSV('${key}')" class="btn btn-ghost">📄 CSV</button>
+        <button onclick="openForm('${key}')" class="btn btn-primary">+ เพิ่ม${schema.label}</button>
+      </div>
+    </div>
+    <div class="card overflow-hidden">
+      <div class="overflow-x-auto scroll-narrow">
+        <table>
+          <thead><tr id="tableHead"></tr></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+      <div id="tableEmpty" class="hidden p-12 text-center text-ink-mute">
+        <div class="text-3xl mb-2">📭</div>
+        <div>ยังไม่มีข้อมูล — กดปุ่ม "เพิ่ม" เพื่อเริ่ม</div>
+      </div>
+    </div>
+  `;
+
+  // header
+  const headRow = document.getElementById('tableHead');
+  headRow.innerHTML = schema.cols.map(c => `<th>${getColLabel(schema, c)}</th>`).join('') + '<th class="text-right">การกระทำ</th>';
+
+  // status filter options
+  const statusField = schema.fields.find(f => f.k === 'status' || f.k === 'result');
+  if (statusField && document.getElementById('filterStatus')) {
+    document.getElementById('filterStatus').innerHTML += statusField.options.map(o => `<option value="${o[0]}">${o[1]}</option>`).join('');
+    document.getElementById('filterStatus').addEventListener('change', () => filterTable(key));
+  }
+  document.getElementById('searchInput').addEventListener('input', () => filterTable(key));
+  filterTable(key);
+}
+function getColLabel(schema, k) {
+  if (k === 'id') return 'ID';
+  const f = schema.fields.find(x => x.k === k);
+  return f ? f.label : k;
+}
+function filterTable(key) {
+  const schema = SCHEMA[key];
+  const q = (document.getElementById('searchInput')?.value || '').toLowerCase();
+  const fs = document.getElementById('filterStatus')?.value || '';
+  let items = (DB[key] || []).filter(it => {
+    const hay = JSON.stringify(it).toLowerCase();
+    if (q && !hay.includes(q)) return false;
+    if (fs && it.status !== fs && it.result !== fs) return false;
+    return true;
+  });
+  items.sort((a,b) => (b.id||'').localeCompare(a.id||''));
+  document.getElementById('recordCount').textContent = items.length;
+  const body = document.getElementById('tableBody');
+  if (!items.length) {
+    body.innerHTML = '';
+    document.getElementById('tableEmpty').classList.remove('hidden');
+    return;
+  }
+  document.getElementById('tableEmpty').classList.add('hidden');
+  body.innerHTML = items.map(it => {
+    const cells = schema.cols.map(c => `<td>${renderCell(schema, c, it)}</td>`).join('');
+    return `<tr>
+      ${cells}
+      <td class="text-right whitespace-nowrap">
+        <button onclick="viewItem('${key}','${it.id}')" class="text-ink-mute hover:text-brand mr-2" title="ดู">👁</button>
+        <button onclick="openForm('${key}','${it.id}')" class="text-ink-mute hover:text-brand mr-2" title="แก้ไข">✎</button>
+        <button onclick="deleteItem('${key}','${it.id}')" class="text-red-500 hover:text-red-700" title="ลบ">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+function renderCell(schema, k, it) {
+  const v = it[k];
+  if (v === undefined || v === null || v === '') return '<span class="text-ink-mute">-</span>';
+  const f = schema.fields.find(x => x.k === k);
+  if (k === 'id') return `<span class="font-mono text-xs text-ink-mute">${v}</span>`;
+  if (k === 'status') {
+    const map = { Approved:'green', Active:'green', Closed:'green', Completed:'green', PASS:'green', IN_LIMIT:'green',
+                  Conditional:'amber', 'In Progress':'amber', 'Pending Verification':'amber', Pending:'amber', Planned:'amber',
+                  Rejected:'red', FAIL:'red', OUT_OF_LIMIT:'red', Open:'red', Inactive:'gray', Cancelled:'gray', Resolved:'blue' };
+    return `<span class="badge badge-${map[v]||'gray'}">${v}</span>`;
+  }
+  if (k === 'result') {
+    return `<span class="badge badge-${v==='PASS'?'green':v==='FAIL'?'red':'amber'}">${v}</span>`;
+  }
+  if (k === 'severity') {
+    const map = { Low:'green', Medium:'amber', High:'red', Critical:'red' };
+    return `<span class="badge badge-${map[v]||'gray'}">${v}</span>`;
+  }
+  if (k === 'risk') {
+    return `<span class="badge badge-${v==='HIGH'?'red':v==='MEDIUM'?'amber':'green'}">${v}</span>`;
+  }
+  if (k === 'isCCP') {
+    return v ? '<span class="badge badge-red">CCP</span>' : '<span class="text-ink-mute text-xs">-</span>';
+  }
+  if (f?.type === 'date' || k.toLowerCase().includes('date')) return fmtDate(v);
+  if (k === 'timestamp') return fmtDateTime(v);
+  if (f?.type === 'ref' && f.refKey) {
+    const ref = (DB[f.refKey]||[]).find(r => r.id === v);
+    if (ref) return `<span title="${v}">${ref[f.refLabel] || v}</span>`;
+  }
+  if (typeof v === 'string' && v.length > 60) return v.slice(0,60) + '…';
+  return v;
+}
+
+/* ---------------- FORM (CREATE / EDIT) ---------------- */
+function openForm(key, id) {
+  const schema = SCHEMA[key];
+  const editing = id ? (DB[key] || []).find(x => x.id === id) : null;
+  const rec = editing ? { ...editing } : { id: nextId(schema.prefix, key) };
+
+  // build form
+  const fieldsHtml = schema.fields.map(f => {
+    const val = rec[f.k] !== undefined ? rec[f.k] : (typeof f.default === 'function' ? f.default() : (f.default ?? ''));
+    if (val !== undefined) rec[f.k] = val;
+    let input = '';
+    if (f.type === 'textarea') {
+      input = `<textarea class="textarea" rows="2" data-k="${f.k}" ${f.required?'required':''}>${val||''}</textarea>`;
+    } else if (f.type === 'select') {
+      const opts = f.dynamicOptions ? f.dynamicOptions() : f.options;
+      input = `<select class="select" data-k="${f.k}" ${f.required?'required':''}>
+        <option value="">-- เลือก --</option>
+        ${opts.map(o => `<option value="${o[0]}" ${val===o[0]?'selected':''}>${o[1]}</option>`).join('')}
+      </select>`;
+    } else if (f.type === 'ref') {
+      const refItems = DB[f.refKey] || [];
+      input = `<select class="select" data-k="${f.k}" ${f.required?'required':''}>
+        <option value="">-- เลือก --</option>
+        ${refItems.map(r => `<option value="${r.id}" ${val===r.id?'selected':''}>${r.id} — ${r[f.refLabel]}</option>`).join('')}
+      </select>`;
+    } else if (f.type === 'checkbox') {
+      input = `<label class="flex items-center gap-2 mt-2"><input type="checkbox" data-k="${f.k}" ${val?'checked':''}> <span class="text-sm">ใช่</span></label>`;
+    } else {
+      input = `<input type="${f.type||'text'}" class="input" data-k="${f.k}" value="${val??''}" ${f.required?'required':''} ${f.placeholder?`placeholder="${f.placeholder}"`:''} ${f.min!==undefined?`min="${f.min}"`:''} ${f.max!==undefined?`max="${f.max}"`:''} ${f.step?`step="${f.step}"`:''}>`;
+    }
+    // wrap scannable fields with a camera button
+    if (f.scan) {
+      input = `<div class="flex gap-1.5 items-stretch">
+        <div class="flex-1">${input}</div>
+        <button type="button" onclick="openScanner('${f.k}','${f.type==='ref'?f.refKey:''}')" class="btn btn-ghost px-2.5" title="สแกนบาร์โค้ด/QR" style="border-color:#0D6E64;color:#0D6E64">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>
+        </button>
+      </div>`;
+    }
+    return `<div><label class="label">${f.label}${f.required?' *':''}</label>${input}</div>`;
+  }).join('');
+
+  document.getElementById('modalTitle').textContent = (editing ? 'แก้ไข' : 'เพิ่ม') + schema.label + ' — ' + rec.id;
+  document.getElementById('modalBody').innerHTML = `
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="formGrid">${fieldsHtml}</div>
+    <div class="flex gap-2 justify-end mt-5 pt-4 border-t border-stone-200">
+      <button onclick="closeModal()" class="btn btn-ghost">ยกเลิก</button>
+      <button onclick="saveForm('${key}','${id||''}')" class="btn btn-primary">${editing?'บันทึก':'เพิ่ม'}</button>
+    </div>
+  `;
+  showModal();
+}
+function saveForm(key, existingId) {
+  const schema = SCHEMA[key];
+  const rec = {};
+  const grid = document.getElementById('formGrid');
+  let valid = true;
+  schema.fields.forEach(f => {
+    const el = grid.querySelector(`[data-k="${f.k}"]`);
+    if (!el) return;
+    let val;
+    if (f.type === 'checkbox') val = el.checked;
+    else if (f.type === 'number') val = el.value === '' ? null : Number(el.value);
+    else val = el.value;
+    if (f.required && (val === '' || val === null || val === undefined)) {
+      el.style.borderColor = '#DC2626';
+      valid = false;
+    } else {
+      el.style.borderColor = '';
+    }
+    rec[f.k] = val;
+  });
+  if (!valid) { toast('กรุณากรอกข้อมูลให้ครบ', 'error'); return; }
+
+  if (existingId) {
+    const idx = DB[key].findIndex(x => x.id === existingId);
+    rec.id = existingId;
+    rec.created = DB[key][idx].created || nowISO();
+    rec.modified = nowISO();
+    DB[key][idx] = { ...DB[key][idx], ...rec };
+    toast('บันทึกการแก้ไขแล้ว');
+  } else {
+    rec.id = nextId(schema.prefix, key);
+    rec.created = nowISO();
+    DB[key].push(rec);
+    toast('เพิ่ม' + schema.label + 'แล้ว');
+    if (schema.onFail) schema.onFail(rec);
+  }
+  saveDB();
+  closeModal();
+  navigateTo(currentPage);
+}
+function deleteItem(key, id) {
+  if (!confirmAction('ยืนยันการลบรายการ ' + id + ' ?')) return;
+  DB[key] = (DB[key] || []).filter(x => x.id !== id);
+  saveDB();
+  toast('ลบแล้ว', 'info');
+  navigateTo(currentPage);
+}
+function viewItem(key, id) {
+  const schema = SCHEMA[key];
+  const it = (DB[key] || []).find(x => x.id === id);
+  if (!it) return;
+  const html = schema.fields.map(f => {
+    let v = it[f.k];
+    if (v === undefined || v === '' || v === null) v = '-';
+    if (f.type === 'ref') {
+      const ref = (DB[f.refKey]||[]).find(r => r.id === v);
+      if (ref) v = `${v} — ${ref[f.refLabel]}`;
+    }
+    if (f.type === 'checkbox') v = v ? '✓ ใช่' : 'ไม่';
+    if (typeof v === 'string' && f.k.includes('date')) v = fmtDate(v);
+    return `<div class="border-b border-stone-100 py-2">
+      <div class="text-xs text-ink-mute uppercase tracking-wider font-semibold">${f.label}</div>
+      <div class="mt-1 text-sm whitespace-pre-wrap">${v}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('modalTitle').textContent = schema.label + ' — ' + id;
+  document.getElementById('modalBody').innerHTML = `
+    ${html}
+    <div class="flex gap-2 justify-end mt-5 pt-4 border-t border-stone-200">
+      <button onclick="window.print()" class="btn btn-ghost">🖨 พิมพ์</button>
+      <button onclick="closeModal();openForm('${key}','${id}')" class="btn btn-primary">แก้ไข</button>
+    </div>
+  `;
+  showModal();
+}
+
+/* ========================================================================
+   BARCODE / QR SCANNER (camera) — html5-qrcode
+   - opens camera overlay, scans QR + 1D barcodes (EAN/Code128/etc.)
+   - smart-fills the target field:
+     • ref field (supplier/material/FG/packaging): matches scanned text against
+       id OR name; if found, selects that option
+     • text field (lot/batch): fills the raw scanned value
+   - manual entry fallback if camera unavailable / denied
+   ======================================================================== */
+let _scanner = null;
+let _scanTarget = { key: null, refKey: null };
+let _scanCallback = null;   // for forms outside the formGrid system (e.g. in-process)
+
+async function openScannerFor(callback) {
+  // generic scanner that returns raw text to a callback
+  _scanCallback = callback;
+  _scanTarget = { key: null, refKey: null };
+  await startScannerUI();
+}
+
+async function openScanner(fieldKey, refKey) {
+  _scanTarget = { key: fieldKey, refKey: refKey || null };
+  _scanCallback = null;
+  await startScannerUI();
+}
+
+async function startScannerUI() {
+  const overlay = document.getElementById('scannerOverlay');
+  overlay.classList.remove('hidden');
+  document.getElementById('scannerManual').classList.add('hidden');
+  document.getElementById('scannerHint').textContent = 'กำลังเปิดกล้อง...';
+
+  // Library present?
+  if (typeof Html5Qrcode === 'undefined') {
+    document.getElementById('scannerHint').textContent = 'ไม่สามารถโหลดตัวสแกนได้ — กรุณาพิมพ์รหัสด้วยตนเอง';
+    toggleScannerManual(true);
+    return;
+  }
+  try {
+    _scanner = new Html5Qrcode('scannerView', { verbose: false });
+    const config = { fps: 10, qrbox: { width: 220, height: 220 }, aspectRatio: 1.0 };
+    await _scanner.start(
+      { facingMode: 'environment' },   // rear camera
+      config,
+      (decodedText) => { onScanSuccess(decodedText); },
+      () => {}                          // ignore per-frame decode errors
+    );
+    document.getElementById('scannerHint').textContent = 'วางบาร์โค้ดหรือ QR ให้อยู่ในกรอบ';
+  } catch (err) {
+    console.warn('camera error', err);
+    document.getElementById('scannerHint').textContent = 'เปิดกล้องไม่ได้ (' + (err?.message||err) + ') — พิมพ์รหัสด้วยตนเอง';
+    toggleScannerManual(true);
+  }
+}
+
+function onScanSuccess(text) {
+  // haptic + sound feedback
+  try { navigator.vibrate && navigator.vibrate(80); } catch {}
+  applyScanResult(text);
+  closeScanner();
+}
+
+function applyScanResult(rawText) {
+  const text = String(rawText || '').trim();
+  if (!text) return;
+  // callback mode (custom forms like in-process)
+  if (_scanCallback) {
+    _scanCallback(text);
+    toast(`สแกนได้: ${text}`, 'success');
+    return;
+  }
+  const { key, refKey } = _scanTarget;
+  const grid = document.getElementById('formGrid');
+  if (!grid) return;
+  const el = grid.querySelector(`[data-k="${key}"]`);
+  if (!el) return;
+
+  if (refKey) {
+    // try to match against the reference table by id or name
+    const items = DB[refKey] || [];
+    // exact id match first, then case-insensitive name contains
+    let match = items.find(r => String(r.id).toLowerCase() === text.toLowerCase());
+    if (!match) {
+      // some QR encode "ID|name" or "ID,name" — take the first token
+      const token = text.split(/[|,;\s]/)[0];
+      match = items.find(r => String(r.id).toLowerCase() === token.toLowerCase());
+    }
+    if (!match) {
+      match = items.find(r => (r.name||'').toLowerCase().includes(text.toLowerCase()));
+    }
+    if (match) {
+      el.value = match.id;
+      el.style.borderColor = '#0D6E64';
+      toast(`เลือก: ${match.id} — ${match.name}`, 'success');
+    } else {
+      toast(`ไม่พบรายการที่ตรงกับ "${text}"`, 'error');
+    }
+  } else {
+    // plain text field (lot / batch): fill raw value
+    el.value = text;
+    el.style.borderColor = '#0D6E64';
+    toast(`สแกนได้: ${text}`, 'success');
+  }
+  // trigger any listeners
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+  el.dispatchEvent(new Event('change', { bubbles: true }));
+}
+
+function toggleScannerManual(forceShow) {
+  const m = document.getElementById('scannerManual');
+  if (forceShow === true) m.classList.remove('hidden');
+  else m.classList.toggle('hidden');
+  if (!m.classList.contains('hidden')) {
+    setTimeout(() => document.getElementById('scannerManualInput')?.focus(), 100);
+  }
+}
+function submitManualScan() {
+  const v = document.getElementById('scannerManualInput').value.trim();
+  if (!v) return;
+  applyScanResult(v);
+  document.getElementById('scannerManualInput').value = '';
+  closeScanner();
+}
+
+async function closeScanner() {
+  const overlay = document.getElementById('scannerOverlay');
+  if (_scanner) {
+    try { await _scanner.stop(); _scanner.clear(); } catch {}
+    _scanner = null;
+  }
+  _scanCallback = null;
+  overlay.classList.add('hidden');
+  document.getElementById('scannerView').innerHTML = '';
+}
+// allow Enter in manual input
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && document.activeElement?.id === 'scannerManualInput') { e.preventDefault(); submitManualScan(); }
+  if (e.key === 'Escape' && !document.getElementById('scannerOverlay').classList.contains('hidden')) closeScanner();
+});
+
+/* ========================================================================
+   IN-PROCESS INSPECTION MODULE (FM-QA-32)
+   Nested structure: Inspection -> Processes[] -> Parameters[] -> Rounds[]
+   - 1 process has many control parameters
+   - each parameter can be measured multiple times (rounds)
+   - auto PASS/FAIL evaluation against master spec
+   - A4 printable report following QMS standard
+   ======================================================================== */
+
+// Working draft held in memory while the form is open
+let ipDraft = null;
+
+/* ---- spec evaluator: parse master spec string, judge a measured value ---- */
+function evalSpec(spec, value) {
+  if (value === '' || value === null || value === undefined) return 'NA';
+  const s = String(spec || '').trim();
+  if (!s || s === '-') return 'NA';
+  const norm = s.replace(/[()]/g, '').replace(/[–—]/g, '-'); // strip parens, normalize dashes
+  const num = parseFloat(String(value).replace(/[^0-9.\-]/g, ''));
+  let m;
+  // >= / ≥
+  if ((m = norm.match(/^[≥>]=?\s*(-?\d+\.?\d*)/))) {
+    if (isNaN(num)) return 'NA';
+    return num >= parseFloat(m[1]) ? 'PASS' : 'FAIL';
+  }
+  // <= / ≤
+  if ((m = norm.match(/^[≤<]=?\s*(-?\d+\.?\d*)/))) {
+    if (isNaN(num)) return 'NA';
+    return num <= parseFloat(m[1]) ? 'PASS' : 'FAIL';
+  }
+  // range  A - B  (supports negatives, e.g. -4 - 4)
+  if ((m = norm.match(/(-?\d+\.?\d*)\s*-\s*(-?\d+\.?\d*)/))) {
+    if (isNaN(num)) return 'NA';
+    const lo = Math.min(parseFloat(m[1]), parseFloat(m[2]));
+    const hi = Math.max(parseFloat(m[1]), parseFloat(m[2]));
+    return (num >= lo && num <= hi) ? 'PASS' : 'FAIL';
+  }
+  // ø metal detector / qualitative
+  if (/ø/.test(s)) {
+    const v = String(value).toLowerCase().trim();
+    if (/ผ่าน|pass|ok|ไม่พบ|none|ปกติ/.test(v)) return 'PASS';
+    if (/ไม่ผ่าน|fail|พบ|detect|reject/.test(v)) return 'FAIL';
+    return 'NA';
+  }
+  // exact number
+  if ((m = norm.match(/^(-?\d+\.?\d*)$/))) {
+    if (isNaN(num)) return 'NA';
+    return num === parseFloat(m[1]) ? 'PASS' : 'FAIL';
+  }
+  return 'NA';
+}
+
+/* ---- compute overall result from the whole draft ---- */
+function ipOverall(draft) {
+  let any = false, fail = false;
+  (draft.processes || []).forEach(p =>
+    (p.parameters || []).forEach(pr =>
+      (pr.rounds || []).forEach(r => {
+        const res = evalSpec(pr.spec, r.value);
+        if (res === 'FAIL') fail = true;
+        if (res !== 'NA') any = true;
+      })
+    )
+  );
+  if (fail) return 'FAIL';
+  if (any) return 'PASS';
+  return 'PENDING';
+}
+
+/* ---- LIST PAGE ---- */
+function renderInprocess(container) {
+  const items = (DB.inprocessInspections || []).slice().sort((a,b)=>(b.id||'').localeCompare(a.id||''));
+  container.innerHTML = `
+    <div class="flex flex-wrap gap-2 mb-4 items-center justify-between">
+      <div class="flex gap-2 items-center flex-wrap">
+        <input id="ipSearch" class="input" placeholder="ค้นหา batch / สินค้า / ผู้ตรวจ..." style="width:260px">
+        <span class="text-sm text-ink-mute">รวม <b>${items.length}</b> รายการ</span>
+      </div>
+      <button onclick="openIpForm()" class="btn btn-primary">+ บันทึกตรวจระหว่างผลิต</button>
+    </div>
+    <div class="card overflow-hidden">
+      <div class="overflow-x-auto scroll-narrow">
+        <table>
+          <thead><tr>
+            <th>เลขที่</th><th>วันที่</th><th>สินค้า / Batch</th><th>กระบวนการ</th>
+            <th>พารามิเตอร์</th><th>จุดตรวจ</th><th>ผล</th><th class="text-right">การกระทำ</th>
+          </tr></thead>
+          <tbody id="ipBody"></tbody>
+        </table>
+      </div>
+      <div id="ipEmpty" class="hidden p-12 text-center text-ink-mute">
+        <div class="text-3xl mb-2">📋</div>
+        <div>ยังไม่มีบันทึก — กดปุ่ม "บันทึกตรวจระหว่างผลิต" เพื่อเริ่ม</div>
+      </div>
+    </div>`;
+  document.getElementById('ipSearch').addEventListener('input', filterIp);
+  filterIp();
+}
+function filterIp() {
+  const q = (document.getElementById('ipSearch')?.value || '').toLowerCase();
+  let items = (DB.inprocessInspections || []).filter(it => !q || JSON.stringify(it).toLowerCase().includes(q));
+  items.sort((a,b)=>(b.id||'').localeCompare(a.id||''));
+  const body = document.getElementById('ipBody');
+  const empty = document.getElementById('ipEmpty');
+  if (!items.length) { body.innerHTML=''; empty.classList.remove('hidden'); return; }
+  empty.classList.add('hidden');
+  body.innerHTML = items.map(it => {
+    const nProc = (it.processes||[]).length;
+    const nParam = (it.processes||[]).reduce((a,p)=>a+(p.parameters||[]).length,0);
+    const nRound = (it.processes||[]).reduce((a,p)=>a+(p.parameters||[]).reduce((b,pr)=>b+(pr.rounds||[]).length,0),0);
+    const prod = it.productName || it.product || '-';
+    const res = it.overallResult || 'PENDING';
+    const badge = res==='PASS'?'green':res==='FAIL'?'red':'amber';
+    return `<tr>
+      <td><span class="font-mono text-xs">${it.id}</span></td>
+      <td>${fmtDate(it.date)}</td>
+      <td>${prod}<div class="text-xs text-ink-mute">${it.batch||'-'}</div></td>
+      <td class="text-center">${nProc}</td>
+      <td class="text-center">${nParam}</td>
+      <td class="text-center">${nRound}</td>
+      <td><span class="badge badge-${badge}">${res}</span></td>
+      <td class="text-right whitespace-nowrap">
+        <button onclick="printIpReport('${it.id}')" class="text-ink-mute hover:text-brand mr-2" title="พิมพ์ A4">🖨</button>
+        <button onclick="openIpForm('${it.id}')" class="text-ink-mute hover:text-brand mr-2" title="แก้ไข">✎</button>
+        <button onclick="deleteIp('${it.id}')" class="text-red-500 hover:text-red-700" title="ลบ">🗑</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+function deleteIp(id) {
+  if (!confirmAction('ยืนยันการลบบันทึก ' + id + ' ?')) return;
+  DB.inprocessInspections = (DB.inprocessInspections||[]).filter(x=>x.id!==id);
+  saveDB(); toast('ลบแล้ว','info'); navigateTo('inprocess');
+}
+
+/* ---- FORM (full-page editor, not modal — needs space for nesting) ---- */
+function openIpForm(id) {
+  const editing = id ? (DB.inprocessInspections||[]).find(x=>x.id===id) : null;
+  ipDraft = editing ? JSON.parse(JSON.stringify(editing)) : {
+    id: nextId('IPI','inprocessInspections'),
+    docNo: 'FM-QA-32',
+    date: today(),
+    batch: '', product: '', productName: '', line: '', shift: 'เช้า',
+    inspector: currentUser?.name || '',
+    note: '',
+    processes: []
+  };
+  renderIpEditor();
+}
+
+function renderIpEditor() {
+  const d = ipDraft;
+  const fgOpts = (DB.finishedGoods||[]).map(f=>`<option value="${f.id}" ${d.product===f.id?'selected':''}>${f.id} — ${f.name}</option>`).join('');
+  const c = document.getElementById('pageContent');
+  document.getElementById('pageTitle').textContent = 'บันทึกตรวจระหว่างกระบวนการผลิต';
+  document.getElementById('pageSubtitle').textContent = 'FM-QA-32 — In-Process Inspection · ' + d.id;
+  c.innerHTML = `
+    <div class="card p-4 mb-4">
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+        <div><label class="label">เลขที่เอกสาร</label><input class="input" value="${d.docNo}" oninput="ipDraft.docNo=this.value"></div>
+        <div><label class="label">วันที่ตรวจ *</label><input type="date" class="input" value="${d.date}" oninput="ipDraft.date=this.value"></div>
+        <div><label class="label">สินค้า (FG)</label>
+          <select class="select" onchange="ipSetProduct(this.value)">
+            <option value="">-- เลือก --</option>${fgOpts}
+          </select></div>
+        <div><label class="label">Batch / Lot</label>
+          <div class="flex gap-1.5">
+            <input id="ipBatchInput" class="input flex-1" value="${d.batch||''}" oninput="ipDraft.batch=this.value" placeholder="B-25xxxx">
+            <button type="button" onclick="openScannerFor(v=>{ipDraft.batch=v;document.getElementById('ipBatchInput').value=v;})" class="btn btn-ghost px-2.5" title="สแกน" style="border-color:#0D6E64;color:#0D6E64">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></svg>
+            </button>
+          </div>
+        </div>
+        <div><label class="label">สายการผลิต</label><input class="input" value="${d.line||''}" oninput="ipDraft.line=this.value" placeholder="Line 1"></div>
+        <div><label class="label">กะ</label>
+          <select class="select" onchange="ipDraft.shift=this.value">
+            ${['เช้า','บ่าย','ดึก'].map(s=>`<option ${d.shift===s?'selected':''}>${s}</option>`).join('')}
+          </select></div>
+        <div><label class="label">ผู้ตรวจ</label><input class="input" value="${d.inspector||''}" oninput="ipDraft.inspector=this.value"></div>
+        <div class="col-span-2"><label class="label">หมายเหตุ</label><input class="input" value="${d.note||''}" oninput="ipDraft.note=this.value"></div>
+      </div>
+    </div>
+
+    <div id="ipProcesses"></div>
+
+    <div class="flex flex-wrap gap-2 mb-6">
+      <button onclick="ipAddProcess()" class="btn btn-ghost border-dashed" style="border:1px dashed #0D6E64;color:#0D6E64">+ เพิ่มกระบวนการ (Process)</button>
+    </div>
+
+    <div class="sticky bottom-0 bg-paper/95 backdrop-blur border-t border-stone-200 py-3 flex flex-wrap gap-2 justify-between items-center -mx-6 px-6">
+      <div class="text-sm">ผลรวม: <span id="ipOverallBadge"></span></div>
+      <div class="flex gap-2">
+        <button onclick="navigateTo('inprocess')" class="btn btn-ghost">ยกเลิก</button>
+        <button onclick="previewIpReport()" class="btn btn-ghost">👁 ดูตัวอย่าง A4</button>
+        <button onclick="saveIp()" class="btn btn-primary">💾 บันทึก</button>
+      </div>
+    </div>`;
+  renderIpProcesses();
+}
+
+function ipSetProduct(fgId) {
+  ipDraft.product = fgId;
+  const fg = (DB.finishedGoods||[]).find(f=>f.id===fgId);
+  ipDraft.productName = fg ? fg.name : '';
+}
+
+function ipAddProcess() {
+  ipDraft.processes.push({ processId:'', processName:'', isCCP:false, parameters:[] });
+  renderIpProcesses();
+}
+function ipRemoveProcess(pi) {
+  ipDraft.processes.splice(pi,1);
+  renderIpProcesses();
+}
+function ipSelectProcess(pi, processId) {
+  const proc = (DB.processes||[]).find(p=>p.id===processId);
+  const blk = ipDraft.processes[pi];
+  blk.processId = processId;
+  blk.processName = proc ? proc.name : '';
+  blk.isCCP = proc ? !!proc.isCCP : false;
+  // auto-load mapped parameters from processParamMap
+  const mapped = (DB.processParamMap||[]).filter(m=>m.processId===processId);
+  blk.parameters = mapped.map(m => {
+    const pr = (DB.parameters||[]).find(p=>p.id===m.parameterId) || {};
+    return { parameterId: m.parameterId, parameterName: pr.name||m.parameterId, spec: pr.spec||'', unit: pr.unit||'', category: pr.category||'', rounds: [{ time:'', value:'' }] };
+  });
+  if (!blk.parameters.length) blk.parameters = [];
+  renderIpProcesses();
+}
+function ipAddParam(pi) {
+  ipDraft.processes[pi].parameters.push({ parameterId:'', parameterName:'', spec:'', unit:'', category:'', rounds:[{ time:'', value:'' }] });
+  renderIpProcesses();
+}
+function ipRemoveParam(pi, qi) {
+  ipDraft.processes[pi].parameters.splice(qi,1);
+  renderIpProcesses();
+}
+function ipSelectParam(pi, qi, paramId) {
+  const pr = (DB.parameters||[]).find(p=>p.id===paramId) || {};
+  const param = ipDraft.processes[pi].parameters[qi];
+  param.parameterId = paramId;
+  param.parameterName = pr.name||paramId;
+  param.spec = pr.spec||'';
+  param.unit = pr.unit||'';
+  param.category = pr.category||'';
+  renderIpProcesses();
+}
+function ipAddRound(pi, qi) {
+  ipDraft.processes[pi].parameters[qi].rounds.push({ time:'', value:'' });
+  renderIpProcesses();
+}
+function ipRemoveRound(pi, qi, ri) {
+  const rounds = ipDraft.processes[pi].parameters[qi].rounds;
+  if (rounds.length <= 1) { toast('ต้องมีอย่างน้อย 1 จุดตรวจ','error'); return; }
+  rounds.splice(ri,1);
+  renderIpProcesses();
+}
+function ipSetRound(pi, qi, ri, field, val) {
+  ipDraft.processes[pi].parameters[qi].rounds[ri][field] = val;
+  // live re-evaluate badge for this round
+  const param = ipDraft.processes[pi].parameters[qi];
+  const res = evalSpec(param.spec, ipDraft.processes[pi].parameters[qi].rounds[ri].value);
+  const badge = document.getElementById(`ipRes-${pi}-${qi}-${ri}`);
+  if (badge) {
+    badge.textContent = res;
+    badge.className = 'badge ' + (res==='PASS'?'badge-green':res==='FAIL'?'badge-red':'badge-gray');
+  }
+  updateIpOverallBadge();
+}
+function updateIpOverallBadge() {
+  const el = document.getElementById('ipOverallBadge');
+  if (!el) return;
+  const res = ipOverall(ipDraft);
+  el.textContent = res;
+  el.className = 'badge ' + (res==='PASS'?'badge-green':res==='FAIL'?'badge-red':'badge-amber');
+}
+
+function renderIpProcesses() {
+  const wrap = document.getElementById('ipProcesses');
+  if (!wrap) return;
+  const procOptions = (DB.processes||[]).map(p=>`${p.id}|${p.name}|${p.isCCP?1:0}`);
+  wrap.innerHTML = ipDraft.processes.map((blk, pi) => {
+    const opts = (DB.processes||[]).map(p=>`<option value="${p.id}" ${blk.processId===p.id?'selected':''}>${p.id} — ${p.name}${p.isCCP?' ⚠️CCP':''}</option>`).join('');
+    const paramRows = (blk.parameters||[]).map((param, qi) => {
+      const paramOpts = (DB.parameters||[]).map(p=>`<option value="${p.id}" ${param.parameterId===p.id?'selected':''}>${p.id} — ${p.name}</option>`).join('');
+      const rounds = (param.rounds||[]).map((r, ri) => {
+        const res = evalSpec(param.spec, r.value);
+        const bcls = res==='PASS'?'badge-green':res==='FAIL'?'badge-red':'badge-gray';
+        return `<div class="flex items-center gap-2 mb-1.5">
+          <span class="text-xs text-ink-mute w-14">ครั้งที่ ${ri+1}</span>
+          <input type="time" class="input" style="width:110px" value="${r.time||''}" onchange="ipSetRound(${pi},${qi},${ri},'time',this.value)">
+          <input class="input" style="flex:1;min-width:80px" placeholder="ค่าที่วัดได้" value="${(r.value!==undefined&&r.value!==null)?String(r.value).replace(/"/g,'&quot;'):''}" oninput="ipSetRound(${pi},${qi},${ri},'value',this.value)">
+          <span id="ipRes-${pi}-${qi}-${ri}" class="badge ${bcls}" style="min-width:48px;text-align:center">${res}</span>
+          <button onclick="ipRemoveRound(${pi},${qi},${ri})" class="text-red-400 hover:text-red-600 px-1" title="ลบจุดตรวจ">✕</button>
+        </div>`;
+      }).join('');
+      return `<div class="pr-no-break border border-stone-200 rounded-lg p-3 mb-2 bg-paper-warm/30">
+        <div class="flex flex-wrap items-end gap-2 mb-2">
+          <div style="flex:2;min-width:200px">
+            <label class="label">พารามิเตอร์ควบคุม</label>
+            <select class="select" onchange="ipSelectParam(${pi},${qi},this.value)">
+              <option value="">-- เลือก --</option>${paramOpts}
+            </select>
+          </div>
+          <div style="width:120px"><label class="label">Spec</label><input class="input" value="${(param.spec||'').replace(/"/g,'&quot;')}" oninput="ipDraft.processes[${pi}].parameters[${qi}].spec=this.value;renderIpProcesses()"></div>
+          <div style="width:80px"><label class="label">หน่วย</label><input class="input" value="${(param.unit||'').replace(/"/g,'&quot;')}" oninput="ipDraft.processes[${pi}].parameters[${qi}].unit=this.value"></div>
+          <button onclick="ipRemoveParam(${pi},${qi})" class="btn btn-ghost text-red-500" title="ลบพารามิเตอร์">🗑</button>
+        </div>
+        <div class="pl-2 border-l-2 border-brand/30">
+          ${rounds}
+          <button onclick="ipAddRound(${pi},${qi})" class="text-xs text-brand font-medium hover:underline mt-1">+ เพิ่มจุดตรวจ (วัดซ้ำ)</button>
+        </div>
+      </div>`;
+    }).join('');
+    return `<div class="card p-4 mb-3 pr-no-break">
+      <div class="flex flex-wrap items-end gap-2 mb-3">
+        <div style="flex:1;min-width:260px">
+          <label class="label">กระบวนการที่ ${pi+1} ${blk.isCCP?'<span class=\"badge badge-red\">CCP</span>':''}</label>
+          <select class="select" onchange="ipSelectProcess(${pi},this.value)">
+            <option value="">-- เลือกกระบวนการ --</option>${opts}
+          </select>
+        </div>
+        <button onclick="ipRemoveProcess(${pi})" class="btn btn-ghost text-red-500">🗑 ลบกระบวนการ</button>
+      </div>
+      ${blk.processId ? `
+        ${paramRows || '<div class="text-sm text-ink-mute mb-2">กระบวนการนี้ยังไม่มีพารามิเตอร์ — กดเพิ่มด้านล่าง</div>'}
+        <button onclick="ipAddParam(${pi})" class="text-sm text-brand font-medium hover:underline">+ เพิ่มพารามิเตอร์ควบคุม</button>
+      ` : '<div class="text-sm text-ink-mute">เลือกกระบวนการเพื่อโหลดพารามิเตอร์อัตโนมัติ</div>'}
+    </div>`;
+  }).join('');
+  updateIpOverallBadge();
+}
+
+function saveIp() {
+  if (!ipDraft.date) { toast('กรุณาระบุวันที่','error'); return; }
+  if (!ipDraft.processes.length) { toast('เพิ่มอย่างน้อย 1 กระบวนการ','error'); return; }
+  ipDraft.overallResult = ipOverall(ipDraft);
+  ipDraft.modified = nowISO();
+  const idx = (DB.inprocessInspections||[]).findIndex(x=>x.id===ipDraft.id);
+  if (idx >= 0) {
+    ipDraft.created = DB.inprocessInspections[idx].created || nowISO();
+    DB.inprocessInspections[idx] = ipDraft;
+  } else {
+    ipDraft.created = nowISO();
+    DB.inprocessInspections.push(ipDraft);
+  }
+  // Auto-NC on FAIL (mirror other modules)
+  if (ipDraft.overallResult === 'FAIL') {
+    const failParams = [];
+    ipDraft.processes.forEach(p=>p.parameters.forEach(pr=>pr.rounds.forEach(r=>{
+      if (evalSpec(pr.spec,r.value)==='FAIL') failParams.push(`${p.processName}/${pr.parameterName}=${r.value}`);
+    })));
+    DB.ncCapa.push({
+      id: nextId('NC','ncCapa'), date: ipDraft.date, type: 'In-Process',
+      description: `พบค่าไม่ผ่านเกณฑ์ระหว่างผลิต (${ipDraft.id}): ${failParams.join('; ')}`,
+      severity: ipDraft.processes.some(p=>p.isCCP) ? 'High' : 'Medium',
+      source: ipDraft.id, status: 'Open', owner: ipDraft.inspector, created: nowISO()
+    });
+    toast('บันทึกแล้ว — สร้าง NC อัตโนมัติเนื่องจากพบค่า FAIL','info');
+  } else {
+    toast('บันทึกแล้ว');
+  }
+  saveDB();
+  navigateTo('inprocess');
+}
+
+/* ---- A4 REPORT (build clean printable HTML) ---- */
+function buildIpReportHtml(it) {
+  const fg = (DB.finishedGoods||[]).find(f=>f.id===it.product);
+  const prodName = it.productName || (fg?fg.name:'') || '-';
+  let bodyRows = '';
+  (it.processes||[]).forEach((p, pi) => {
+    const params = p.parameters||[];
+    let firstOfProc = true;
+    if (!params.length) {
+      bodyRows += `<tr><td>${pi+1}</td><td colspan="6">${p.processName||'-'}${p.isCCP?' (CCP)':''}</td></tr>`;
+      return;
+    }
+    params.forEach(pr => {
+      const rounds = pr.rounds&&pr.rounds.length?pr.rounds:[{time:'',value:''}];
+      rounds.forEach((r, ri) => {
+        const res = evalSpec(pr.spec, r.value);
+        const resCls = res==='PASS'?'pr-pass':res==='FAIL'?'pr-fail':'pr-na';
+        const resTxt = res==='PASS'?'ผ่าน':res==='FAIL'?'ไม่ผ่าน':'-';
+        bodyRows += `<tr>
+          <td>${firstOfProc && ri===0 ? (pi+1) : ''}</td>
+          <td>${ri===0 ? (p.processName||'-') + (p.isCCP?' <b>(CCP)</b>':'') : ''}</td>
+          <td>${ri===0 ? pr.parameterName||'-' : ''}</td>
+          <td style="text-align:center">${ri===0 ? (pr.spec||'-')+(pr.unit?(' '+pr.unit):'') : ''}</td>
+          <td style="text-align:center">${r.time||'-'}</td>
+          <td style="text-align:center">${(r.value!==''&&r.value!=null)?r.value:'-'}</td>
+          <td style="text-align:center" class="${resCls}">${resTxt}</td>
+        </tr>`;
+        firstOfProc = false;
+      });
+    });
+  });
+  const overall = it.overallResult || ipOverall(it);
+  const overallTxt = overall==='PASS'?'ผ่าน (PASS)':overall==='FAIL'?'ไม่ผ่าน (FAIL)':'รอผล';
+  const overallCls = overall==='PASS'?'pr-pass':overall==='FAIL'?'pr-fail':'pr-na';
+  return `
+  <div class="pr-doc pr-page">
+    <table class="pr-head-tbl" style="margin-bottom:2px">
+      <tr>
+        <td style="width:22%;text-align:center;font-weight:700;font-size:14px">SWI FOODS<br><span style="font-weight:400;font-size:10px">สรวรพัฒน์ อินเตอร์ฟู้ดส์</span></td>
+        <td style="text-align:center"><h2>บันทึกการตรวจสอบระหว่างกระบวนการผลิต</h2><div style="font-size:11px">In-Process Inspection Record</div></td>
+        <td style="width:24%;font-size:10px">
+          เอกสารเลขที่: <b>${it.docNo||'FM-QA-32'}</b><br>
+          แก้ไขครั้งที่: 00<br>
+          หน้า 1/1
+        </td>
+      </tr>
+    </table>
+    <table class="pr-head-tbl" style="margin-top:0">
+      <tr>
+        <td style="width:25%"><b>เลขที่บันทึก:</b> ${it.id}</td>
+        <td style="width:25%"><b>วันที่:</b> ${fmtDate(it.date)}</td>
+        <td style="width:25%"><b>สินค้า:</b> ${prodName}</td>
+        <td style="width:25%"><b>Batch/Lot:</b> ${it.batch||'-'}</td>
+      </tr>
+      <tr>
+        <td><b>สายการผลิต:</b> ${it.line||'-'}</td>
+        <td><b>กะ:</b> ${it.shift||'-'}</td>
+        <td colspan="2"><b>ผู้ตรวจ:</b> ${it.inspector||'-'}</td>
+      </tr>
+    </table>
+    <table>
+      <thead><tr>
+        <th style="width:5%">ลำดับ</th>
+        <th style="width:22%">กระบวนการ</th>
+        <th style="width:26%">พารามิเตอร์ควบคุม</th>
+        <th style="width:14%">เกณฑ์ (Spec)</th>
+        <th style="width:10%">เวลา</th>
+        <th style="width:11%">ค่าที่วัดได้</th>
+        <th style="width:12%">ผล</th>
+      </tr></thead>
+      <tbody>${bodyRows || '<tr><td colspan="7" style="text-align:center">ไม่มีข้อมูล</td></tr>'}</tbody>
+    </table>
+    <table class="pr-head-tbl" style="margin-top:4px">
+      <tr><td style="width:60%"><b>หมายเหตุ:</b> ${it.note||'-'}</td>
+          <td style="width:40%"><b>สรุปผลรวม:</b> <span class="${overallCls}">${overallTxt}</span></td></tr>
+    </table>
+    <table class="pr-head-tbl" style="margin-top:14px;border:none">
+      <tr style="border:none">
+        <td style="border:none;text-align:center;width:50%">
+          ลงชื่อ ............................................ ผู้ตรวจ<br><br>
+          ( ${it.inspector||'.......................'} )<br>
+          วันที่ ......./......./.........
+        </td>
+        <td style="border:none;text-align:center;width:50%">
+          ลงชื่อ ............................................ ผู้ทวนสอบ (QA)<br><br>
+          ( ....................................... )<br>
+          วันที่ ......./......./.........
+        </td>
+      </tr>
+    </table>
+  </div>`;
+}
+function printIpReport(id) {
+  const it = (DB.inprocessInspections||[]).find(x=>x.id===id);
+  if (!it) return;
+  const root = document.getElementById('printRoot');
+  root.innerHTML = buildIpReportHtml(it);
+  root.classList.remove('preview');
+  document.body.classList.add('print-report-mode');
+  const cleanup = () => { document.body.classList.remove('print-report-mode'); root.innerHTML=''; window.removeEventListener('afterprint', cleanup); };
+  window.addEventListener('afterprint', cleanup);
+  window.print();
+}
+function previewIpReport() {
+  // Save current draft state into a temp object for preview (without persisting)
+  const temp = JSON.parse(JSON.stringify(ipDraft));
+  temp.overallResult = ipOverall(temp);
+  const root = document.getElementById('printRoot');
+  root.innerHTML = buildIpReportHtml(temp);
+  root.classList.add('preview');
+  root.scrollIntoView({ behavior:'smooth' });
+  // add a small floating bar
+  toast('แสดงตัวอย่าง A4 ด้านล่าง — กด Ctrl+P เพื่อพิมพ์','info');
+}
+
+/* ---------------- REPORTS PAGE ---------------- */
+function renderReports(container) {
+  const today = new Date();
+  const start = new Date(today); start.setDate(start.getDate()-30);
+  container.innerHTML = `
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="card p-5">
+        <h3 class="font-bold mb-3">รายงานประจำวัน — ${fmtDate(today)}</h3>
+        <div class="space-y-2 text-sm" id="dailyReport"></div>
+        <button onclick="window.print()" class="btn btn-ghost mt-3">🖨 พิมพ์รายงาน</button>
+      </div>
+      <div class="card p-5">
+        <h3 class="font-bold mb-3">รายงานประสิทธิภาพ 30 วัน</h3>
+        <div style="height:260px"><canvas id="chartTrend"></canvas></div>
+      </div>
+    </div>
+
+    <div class="card p-5 mt-4">
+      <h3 class="font-bold mb-3">KPI Dashboard ครบทุกตัว</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="kpiGrid"></div>
+    </div>
+  `;
+
+  // daily report items
+  const t = today.toISOString().slice(0,10);
+  const daily = [
+    ['ตรวจรับวัตถุดิบ', DB.rmInspections.filter(r=>(r.date||'').startsWith(t)).length],
+    ['ตรวจ FG', DB.fgInspections.filter(r=>(r.date||'').startsWith(t)).length],
+    ['HACCP/CCP', DB.haccpRecords.filter(r=>(r.timestamp||'').startsWith(t)).length],
+    ['NC ใหม่', DB.ncCapa.filter(r=>(r.date||'').startsWith(t)).length],
+    ['สิ่งแวดล้อม', DB.environmental.filter(r=>(r.date||'').startsWith(t)).length],
+    ['ร้องเรียนใหม่', DB.complaints.filter(r=>(r.date||'').startsWith(t)).length]
+  ];
+  document.getElementById('dailyReport').innerHTML = daily.map(([l,n]) =>
+    `<div class="flex justify-between border-b border-stone-100 py-1"><span>${l}</span><span class="font-mono font-bold">${n}</span></div>`
+  ).join('');
+
+  // trend chart
+  const days = [];
+  for (let i=29;i>=0;i--) { const d = new Date(); d.setDate(d.getDate()-i); days.push(d.toISOString().slice(0,10)); }
+  const rmCount = days.map(d => DB.rmInspections.filter(r => (r.date||'').startsWith(d)).length);
+  const ccpCount = days.map(d => DB.haccpRecords.filter(r => (r.timestamp||'').startsWith(d)).length);
+  const ncCount = days.map(d => DB.ncCapa.filter(r => (r.date||'').startsWith(d)).length);
+  new Chart(document.getElementById('chartTrend'), {
+    type: 'line',
+    data: { labels: days.map(d => d.slice(5)),
+      datasets: [
+        { label: 'RM Insp', data: rmCount, borderColor: '#0D6E64', tension:.3, pointRadius: 0 },
+        { label: 'CCP', data: ccpCount, borderColor: '#2563EB', tension:.3, pointRadius: 0 },
+        { label: 'NC', data: ncCount, borderColor: '#DC2626', tension:.3, pointRadius: 0 }
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } },
+      scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+  });
+
+  // KPI grid
+  const tot = (k,f=()=>true) => (DB[k]||[]).filter(f).length;
+  const div = (a,b) => b ? ((a/b)*100).toFixed(1) : '100.0';
+  const kpis = [
+    ['Receiving Compliance', div(tot('rmInspections',r=>r.result==='PASS'), tot('rmInspections')) + '%', '≥ 98%'],
+    ['CCP Compliance', div(tot('haccpRecords',r=>r.status==='IN_LIMIT'), tot('haccpRecords')) + '%', '= 100%'],
+    ['FG Release Rate', div(tot('fgInspections',r=>r.result==='PASS'), tot('fgInspections')) + '%', '≥ 95%'],
+    ['CAPA Effectiveness', div(tot('ncCapa',r=>r.status==='Closed'), tot('ncCapa')) + '%', '≥ 90%'],
+    ['Open NC Count', tot('ncCapa',r=>r.status!=='Closed'), '≤ 5'],
+    ['Supplier Score (avg)', (DB.suppliers.length? (DB.suppliers.reduce((a,s)=>a+(s.score||0),0)/DB.suppliers.length).toFixed(1):0)+'/100', '≥ 85'],
+    ['Customer Complaint (Open)', tot('complaints',r=>r.status!=='Closed'), '≤ 2'],
+    ['Environmental PASS Rate', div(tot('environmental',r=>r.result==='PASS'), tot('environmental')) + '%', '≥ 95%'],
+    ['Training Completion (mo)', tot('training',r=>r.status==='Completed' && new Date(r.date) > start), '—']
+  ];
+  document.getElementById('kpiGrid').innerHTML = kpis.map(([l,v,t]) =>
+    `<div class="kpi">
+      <div class="text-xs text-ink-mute uppercase tracking-wider font-semibold mb-2">${l}</div>
+      <div class="kpi-value text-2xl text-brand">${v}</div>
+      <div class="text-xs text-ink-mute mt-1">เป้าหมาย ${t}</div>
+    </div>`
+  ).join('');
+}
+
+/* ---------------- SETTINGS ---------------- */
+function renderSettings(container) {
+  container.innerHTML = `
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="card p-5">
+        <h3 class="font-bold mb-3">ข้อมูลระบบ</h3>
+        <table class="w-full text-sm">
+          <tr><td class="py-2 text-ink-mute">เวอร์ชัน</td><td class="text-right font-mono">${DB.meta.version}</td></tr>
+          <tr><td class="py-2 text-ink-mute">บันทึกล่าสุด</td><td class="text-right">${fmtDateTime(DB.meta.lastSync)}</td></tr>
+          <tr><td class="py-2 text-ink-mute">ปริมาณข้อมูล (KB)</td><td class="text-right font-mono">${(localStorage.getItem(STORAGE_KEY)?.length/1024||0).toFixed(1)}</td></tr>
+          <tr><td class="py-2 text-ink-mute">Backend</td><td class="text-right">${API_BASE_URL?'Cloudflare Workers':'localStorage (offline)'}</td></tr>
+        </table>
+        <div class="mt-5 space-y-2">
+          <button onclick="exportAllData()" class="btn btn-ghost w-full justify-center">⬇ Export ข้อมูลทั้งหมด (JSON)</button>
+          <button onclick="document.getElementById('importFile2').click()" class="btn btn-ghost w-full justify-center">⬆ Import ข้อมูล (JSON)</button>
+          <input type="file" id="importFile2" class="hidden" accept=".json" onchange="importAllData(event)">
+          <button onclick="resetData()" class="btn btn-danger w-full justify-center">⚠️ Reset ข้อมูลทั้งหมด</button>
+        </div>
+      </div>
+      <div class="card p-5">
+        <h3 class="font-bold mb-3">ผู้ใช้งานระบบ (${DB.users.length})</h3>
+        <table class="w-full text-sm">
+          <thead><tr><th>Username</th><th>ชื่อ</th><th>Role</th></tr></thead>
+          <tbody>${DB.users.map(u=>`<tr><td class="font-mono">${u.username}</td><td>${u.name}</td><td>${u.role}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>
+      <div class="card p-5 lg:col-span-2">
+        <h3 class="font-bold mb-3">ปริมาณข้อมูลแต่ละ Module</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-2">
+          ${Object.keys(SCHEMA).map(k=>`<div class="p-3 bg-paper-warm rounded text-center"><div class="text-xs text-ink-mute">${SCHEMA[k].label}</div><div class="text-lg font-mono font-bold text-brand">${(DB[k]||[]).length}</div></div>`).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+/* ---------------- EXPORT / IMPORT / RESET ---------------- */
+function exportAllData() {
+  const blob = new Blob([JSON.stringify(DB, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `swi-qa-backup-${today()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Export สำเร็จ');
+}
+function importAllData(e) {
+  const f = e.target.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!data.suppliers || !data.meta) throw new Error('format invalid');
+      if (!confirmAction('ยืนยันนำเข้าข้อมูล — ข้อมูลปัจจุบันจะถูกแทนที่ทั้งหมด')) return;
+      DB = data;
+      saveDB();
+      toast('Import สำเร็จ');
+      navigateTo(currentPage);
+    } catch (err) { toast('ไฟล์ไม่ถูกต้อง: '+err.message, 'error'); }
+  };
+  r.readAsText(f);
+  e.target.value = '';
+}
+function exportCSV(key) {
+  const schema = SCHEMA[key];
+  const items = DB[key] || [];
+  if (!items.length) { toast('ไม่มีข้อมูลให้ export', 'error'); return; }
+  const cols = Object.keys(items[0]).filter(k => k !== 'modified');
+  const rows = [cols.join(',')];
+  items.forEach(it => {
+    rows.push(cols.map(c => {
+      let v = it[c] ?? '';
+      if (typeof v === 'string' && (v.includes(',') || v.includes('"') || v.includes('\n'))) {
+        v = '"' + v.replace(/"/g,'""') + '"';
+      }
+      return v;
+    }).join(','));
+  });
+  const blob = new Blob(['\uFEFF' + rows.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `${key}-${today()}.csv`; a.click();
+  URL.revokeObjectURL(url);
+  toast('Export CSV สำเร็จ');
+}
+function resetData() {
+  if (!confirmAction('⚠️ ยืนยัน Reset ข้อมูลทั้งหมด? — ข้อมูลทั้งหมดจะหายไป')) return;
+  if (!confirmAction('ยืนยันอีกครั้ง — การกระทำนี้ไม่สามารถยกเลิกได้')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  loadDB();
+  saveDB();
+  toast('Reset สำเร็จ — โหลดข้อมูลตั้งต้น');
+  navigateTo('dashboard');
+}
+
+/* ---------------- MODAL ---------------- */
+function showModal() { document.getElementById('modal').classList.remove('hidden'); document.getElementById('modal').classList.add('flex'); }
+function closeModal() { document.getElementById('modal').classList.add('hidden'); document.getElementById('modal').classList.remove('flex'); }
+document.getElementById('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+/* ---------------- INIT ---------------- */
+window.addEventListener('load', () => {
+  loadDB();
+  pingApi();
+  // ping API every 30 seconds to keep status fresh
+  setInterval(pingApi, 30000);
+  const cached = sessionStorage.getItem('swi_qa_user');
+  if (cached) {
+    try {
+      currentUser = JSON.parse(cached);
+      showApp();
+    } catch {}
+  }
+});
+// allow Enter in login
+document.getElementById('loginPass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+document.getElementById('loginUser').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+</script>
+</body>
+</html>
